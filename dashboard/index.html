@@ -378,39 +378,105 @@
     </div>
   </div>
 
-  <!-- QUICK ACTION / WHAT TO DO BANNER -->
-  <div class="bg-gradient-to-r from-amber-950/40 via-yellow-950/20 to-emerald-950/40 border border-amber-500/30 rounded-2xl p-4 glow-card flex flex-col md:flex-row items-center justify-between gap-4">
-    <div class="flex items-center gap-3 w-full md:w-auto">
-      <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-xl shrink-0">
-        💡
-      </div>
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="font-black text-sm text-white">راهنمای گام‌به‌گام کاشت اردر:</span>
-          <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">سیگنال فعال: خرید (Bullish)</span>
+  <!-- SECTION 4: AUTO-PILOT CONFLUENCE ORCHESTRATOR & PRESET SELECTOR -->
+  <div class="bg-gradient-to-r from-[#0f172a] via-[#0d121f] to-[#131b2e] border border-indigo-500/40 rounded-2xl p-4.5 glow-card space-y-3.5">
+    
+    <!-- UPPER BAR: AUTOPILOT HEADER & CONTROLS -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-2.5 border-b border-gray-800/80">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-base shadow-lg shadow-indigo-500/30">
+          🤖
         </div>
-        <p class="text-xs text-gray-300 mt-1 leading-relaxed">
-          طلا سقف حمایتی ۳۵۰۰ دلار را حفظ کرده و ریزش دلار (DXY) از رشد آن حمایت می‌کند. یکی از ستاپ‌های زیر را انتخاب کنید:
-        </p>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="font-black text-white text-sm">مغز تصمیم‌گیری و انتخاب‌گر خودکار ستاپ (Auto-Pilot Confluence)</h2>
+            <span dir="ltr" class="text-[10px] mono px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700 font-bold flex items-center gap-1" id="autopilot-status-badge">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>اتوپایلوت: فعال (AUTO)</span>
+            </span>
+          </div>
+          <p class="text-[11px] text-gray-300 mt-0.5" id="autopilot-reason">
+            همگرایی ماکرو با تضعیف دلار (92%) و رژیم هورست (H=0.48) ستاپ ۱ را با برتری آماری تایید می‌کنند.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <span dir="ltr" class="mono text-xs px-2.5 py-1 rounded-xl bg-indigo-950/80 text-amber-300 border border-indigo-700 font-bold" id="autopilot-score">
+          94% تایید (A+ PRIME)
+        </span>
+        <button onclick="toggleAutoPilot()" id="btn-autopilot-toggle" class="px-2.5 py-1 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-300 transition text-xs active:scale-95">
+          سوئیچ به حالت دستی
+        </button>
       </div>
     </div>
 
-    <!-- 1-CLICK PRESETS -->
-    <div class="flex flex-wrap items-center gap-2 w-full md:w-auto shrink-0">
-      <button onclick="applyPreset('pullback')" id="p-pullback" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 active:scale-95">
-        <span>🟢 ستاپ ۱: خرید در اوردربلاک تقاضا (3,595$)</span>
-        <span dir="ltr" class="text-[10px] mono bg-emerald-900/80 px-1.5 py-0.5 rounded">R:R 2.4</span>
+    <!-- DANGER BANNER (IF NEWS DANGER DETECTED) -->
+    <div id="autopilot-news-danger" class="hidden p-3 rounded-xl bg-red-950/80 border border-red-600 text-red-200 text-xs font-bold animate-pulse flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="text-lg">🚨</span>
+        <span>سپر اخبار فعال است: خبر با نوسان شدید در پیش است؛ کاشت اردر جدید متوقف شده است.</span>
+      </div>
+      <span class="text-[10px] mono bg-red-900 px-2 py-0.5 rounded border border-red-500">HOLD ORDERS</span>
+    </div>
+
+    <!-- 3 PRESET CARDS WITH DYNAMIC AUTOPILOT TAGS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      
+      <!-- PRESET 1: PULLBACK (DEFAULT PRIME) -->
+      <button onclick="applyPreset('pullback')" id="p-pullback" class="p-3 rounded-xl bg-emerald-950/50 hover:bg-emerald-900/60 border-2 border-emerald-500 text-right transition shadow-lg shadow-emerald-500/20 active:scale-95 space-y-1.5">
+        <div class="flex justify-between items-center text-xs">
+          <span class="font-black text-white flex items-center gap-1.5">
+            <span>🟢 ستاپ ۱: خرید در اوردربلاک تقاضا</span>
+          </span>
+          <span dir="ltr" class="mono text-[10px] bg-emerald-900 text-emerald-200 px-1.5 py-0.5 rounded font-bold">R:R 2.43</span>
+        </div>
+        <div class="flex justify-between items-baseline text-[11px] mono">
+          <span class="text-emerald-400 font-bold">Entry: $3,595.00</span>
+          <span class="text-gray-400 text-[10px]">SL: $3,580.00 | TP: $3,631.40</span>
+        </div>
+        <div class="pt-1 border-t border-emerald-800/60 flex justify-between items-center text-[10px]">
+          <span class="text-amber-300 font-bold" id="p-pullback-tag">★ ستاپ منتخب اتوپایلوت (A+ Confluence)</span>
+          <span class="text-gray-400 mono">Buy Limit</span>
+        </div>
       </button>
 
-      <button onclick="applyPreset('breakout')" id="p-breakout" class="px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-300 font-bold text-xs transition flex items-center gap-1.5 active:scale-95">
-        <span>🔵 ستاپ ۲: خرید در شکست سقف (3,637$)</span>
-        <span dir="ltr" class="text-[10px] mono bg-gray-800 px-1.5 py-0.5 rounded">R:R 2.2</span>
+      <!-- PRESET 2: BREAKOUT -->
+      <button onclick="applyPreset('breakout')" id="p-breakout" class="p-3 rounded-xl bg-gray-950/70 hover:bg-gray-900 border border-gray-800 text-right transition active:scale-95 space-y-1.5">
+        <div class="flex justify-between items-center text-xs">
+          <span class="font-black text-gray-300 flex items-center gap-1.5">
+            <span>🔵 ستاپ ۲: خرید شکست سقف</span>
+          </span>
+          <span dir="ltr" class="mono text-[10px] bg-gray-800 text-gray-300 px-1.5 py-0.5 rounded font-bold">R:R 2.20</span>
+        </div>
+        <div class="flex justify-between items-baseline text-[11px] mono">
+          <span class="text-blue-400 font-bold">Entry: $3,637.50</span>
+          <span class="text-gray-400 text-[10px]">SL: $3,622.00 | TP: $3,672.00</span>
+        </div>
+        <div class="pt-1 border-t border-gray-800 flex justify-between items-center text-[10px]">
+          <span class="text-gray-400" id="p-breakout-tag">در انتظار تایید مومنتوم (H > 0.55)</span>
+          <span class="text-gray-500 mono">Buy Stop</span>
+        </div>
       </button>
 
-      <button onclick="applyPreset('rejection')" id="p-rejection" class="px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-300 font-bold text-xs transition flex items-center gap-1.5 active:scale-95">
-        <span>🔴 ستاپ ۳: فروش اصلاحی از سقف (3,636$)</span>
-        <span dir="ltr" class="text-[10px] mono bg-gray-800 px-1.5 py-0.5 rounded">R:R 2.1</span>
+      <!-- PRESET 3: REJECTION -->
+      <button onclick="applyPreset('rejection')" id="p-rejection" class="p-3 rounded-xl bg-gray-950/70 hover:bg-gray-900 border border-gray-800 text-right transition active:scale-95 space-y-1.5">
+        <div class="flex justify-between items-center text-xs">
+          <span class="font-black text-gray-300 flex items-center gap-1.5">
+            <span>🔴 ستاپ ۳: فروش اصلاحی از سقف</span>
+          </span>
+          <span dir="ltr" class="mono text-[10px] bg-gray-800 text-gray-300 px-1.5 py-0.5 rounded font-bold">R:R 2.10</span>
+        </div>
+        <div class="flex justify-between items-baseline text-[11px] mono">
+          <span class="text-red-400 font-bold">Entry: $3,636.00</span>
+          <span class="text-gray-400 text-[10px]">SL: $3,648.00 | TP: $3,605.00</span>
+        </div>
+        <div class="pt-1 border-t border-gray-800 flex justify-between items-center text-[10px]">
+          <span class="text-gray-400" id="p-rejection-tag">ریسک بالا در خلاف جهت ضعف دلار</span>
+          <span class="text-gray-500 mono">Sell Limit</span>
+        </div>
       </button>
+
     </div>
   </div>
 
@@ -679,27 +745,61 @@
       direction: 'long'
     };
 
-    function applyPreset(type) {
+    let autoPilotActive = true;
+    let recommendedSetupKey = 'pullback';
+
+    function toggleAutoPilot() {
+      autoPilotActive = !autoPilotActive;
+      const btn = document.getElementById('btn-autopilot-toggle');
+      const badge = document.getElementById('autopilot-status-badge');
+      if (autoPilotActive) {
+        btn.innerText = "سوئیچ به حالت دستی";
+        btn.className = "px-2.5 py-1 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-300 transition text-xs active:scale-95";
+        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span><span>اتوپایلوت: فعال (AUTO)</span>`;
+        badge.className = "text-[10px] mono px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700 font-bold flex items-center gap-1";
+        fetchAutoPilot();
+      } else {
+        btn.innerText = "فعال‌سازی مجدد اتوپایلوت";
+        btn.className = "px-2.5 py-1 rounded-xl bg-indigo-900/80 hover:bg-indigo-800 text-indigo-300 border border-indigo-600 transition text-xs active:scale-95 font-bold";
+        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-gray-500"></span><span>حالت: دستی (MANUAL)</span>`;
+        badge.className = "text-[10px] mono px-2 py-0.5 rounded-full bg-gray-900 text-gray-400 border border-gray-700 font-bold flex items-center gap-1";
+      }
+    }
+
+    function applyPreset(type, userClicked=true) {
+      if (userClicked && type !== recommendedSetupKey && autoPilotActive) {
+        const badge = document.getElementById('autopilot-status-badge');
+        if (badge) {
+          badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span>دستی (انتخاب کاربر)</span>`;
+          badge.className = "text-[10px] mono px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-700 font-bold flex items-center gap-1";
+        }
+      }
+
       ['pullback', 'breakout', 'rejection'].forEach(t => {
         const btn = document.getElementById(`p-${t}`);
-        if (btn) btn.className = "px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-300 font-bold text-xs transition flex items-center gap-1.5 active:scale-95";
+        if (btn) {
+          btn.className = "p-3 rounded-xl bg-gray-950/70 hover:bg-gray-900 border border-gray-800 text-right transition active:scale-95 space-y-1.5";
+        }
       });
 
       if (type === 'pullback') {
         currentDirection = 'long';
         setup = { entry: 3595.0, stop: 3580.0, target: 3631.4, direction: 'long' };
         currentOrderType = 'BUY_LIMIT';
-        document.getElementById('p-pullback').className = "px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 active:scale-95";
+        const pEl = document.getElementById('p-pullback');
+        if (pEl) pEl.className = "p-3 rounded-xl bg-emerald-950/60 hover:bg-emerald-900/60 border-2 border-emerald-500 text-right transition shadow-lg shadow-emerald-500/20 active:scale-95 space-y-1.5 ring-2 ring-emerald-500/30";
       } else if (type === 'breakout') {
         currentDirection = 'long';
         setup = { entry: 3637.5, stop: 3622.0, target: 3672.0, direction: 'long' };
         currentOrderType = 'BUY_STOP';
-        document.getElementById('p-breakout').className = "px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition shadow-lg shadow-blue-600/30 flex items-center gap-1.5 active:scale-95";
+        const bEl = document.getElementById('p-breakout');
+        if (bEl) bEl.className = "p-3 rounded-xl bg-blue-950/60 hover:bg-blue-900/60 border-2 border-blue-500 text-right transition shadow-lg shadow-blue-500/20 active:scale-95 space-y-1.5 ring-2 ring-blue-500/30";
       } else if (type === 'rejection') {
         currentDirection = 'short';
         setup = { entry: 3636.0, stop: 3648.0, target: 3605.0, direction: 'short' };
         currentOrderType = 'SELL_LIMIT';
-        document.getElementById('p-rejection').className = "px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs transition shadow-lg shadow-red-600/30 flex items-center gap-1.5 active:scale-95";
+        const rEl = document.getElementById('p-rejection');
+        if (rEl) rEl.className = "p-3 rounded-xl bg-red-950/60 hover:bg-red-900/60 border-2 border-red-500 text-right transition shadow-lg shadow-red-500/20 active:scale-95 space-y-1.5 ring-2 ring-red-500/30";
       }
 
       updateInputs();
@@ -1042,6 +1142,47 @@
       }
     }
 
+    // FETCH AUTOPILOT CONFLUENCE ORCHESTRATION
+    async function fetchAutoPilot() {
+      try {
+        const res = await fetch('/api/autopilot');
+        if (res.ok) {
+          const data = await res.json();
+          recommendedSetupKey = data.recommended_setup;
+
+          const scoreEl = document.getElementById('autopilot-score');
+          if (scoreEl) scoreEl.innerText = `${data.confluence_score}% تایید (${data.confluence_grade})`;
+
+          const reasonEl = document.getElementById('autopilot-reason');
+          if (reasonEl) reasonEl.innerText = data.reason;
+
+          const dangerEl = document.getElementById('autopilot-news-danger');
+          if (dangerEl) {
+            if (data.shield_status === 'DANGER') {
+              dangerEl.classList.remove('hidden');
+            } else {
+              dangerEl.classList.add('hidden');
+            }
+          }
+
+          if (data.setups) {
+            const pTag = document.getElementById('p-pullback-tag');
+            const bTag = document.getElementById('p-breakout-tag');
+            const rTag = document.getElementById('p-rejection-tag');
+            if (pTag && data.setups.pullback) pTag.innerText = data.setups.pullback.tag;
+            if (bTag && data.setups.breakout) bTag.innerText = data.setups.breakout.tag;
+            if (rTag && data.setups.rejection) rTag.innerText = data.setups.rejection.tag;
+          }
+
+          if (autoPilotActive && data.recommended_setup && data.recommended_setup !== 'NONE') {
+            applyPreset(data.recommended_setup, false);
+          }
+        }
+      } catch (e) {
+        console.error("AutoPilot fetch error:", e);
+      }
+    }
+
     async function refreshData() {
       try {
         const res = await fetch('/api/gold');
@@ -1057,6 +1198,7 @@
       fetchMacro();
       fetchCalendar();
       fetchQuantData();
+      fetchAutoPilot();
       recalculateAll();
       simulateMonteCarlo();
     }

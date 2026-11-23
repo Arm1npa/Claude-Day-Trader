@@ -379,6 +379,79 @@ def advanced_monte_carlo(entry, stop, target, direction="long", num_sims=5000, l
         "verdict": "STRONG_EDGE" if ev_r >= 0.3 else "POSITIVE_EDGE"
     }
 
+def evaluate_autopilot():
+    """Evaluate Auto-Pilot Confluence combining Quant Finance, Macro Radar, and News Shield to select the winning setup."""
+    ticker_data = fetch_ticker_data("GC=F")
+    quant = ticker_data.get("quant", {})
+    macro = fetch_macro_correlation()
+    calendar = fetch_economic_calendar()
+
+    current_price = ticker_data.get("current_price", 3620.0)
+    hurst = quant.get("hurst_exponent", 0.50)
+    z_score = quant.get("z_score", 0.0)
+    macro_score = macro.get("confluence", {}).get("score", 70)
+    macro_bias = macro.get("confluence", {}).get("bias", "BULLISH")
+    shield_status = calendar.get("shield_status", "SAFE")
+
+    if shield_status == "DANGER":
+        recommended_setup = "NONE"
+        status_verdict = "BLOCKED_BY_NEWS"
+        reason = "سپر اخبار فعال است؛ انتشار داده‌های اقتصادی مهم با نوسان شدید در پیش است. جهت جلوگیری از اسلیپیج و باز شدن اسپرد، کاشت اردر متوقف شد."
+        confluence_grade = "DANGER"
+        score = 25
+    elif z_score > 2.0:
+        recommended_setup = "rejection"
+        status_verdict = "SHORT_SCALP_REJECTION"
+        reason = f"زی‌اسکور در سقف آماری ({z_score}σ) قرار دارد؛ احتمال اصلاح و ریجکشن از سقف ۳۶۳۶ دلاری وجود دارد."
+        confluence_grade = "B+ (OVERBOUGHT)"
+        score = 80
+    elif hurst >= 0.56:
+        recommended_setup = "breakout"
+        status_verdict = "CONFIRMED_MOMENTUM_BREAKOUT"
+        reason = f"ضریب هورست ({hurst}) رژیم مومنتوم روندی پایدار را نشان می‌دهد؛ ورود در شکست سقف ۳٬۶۳۷ دلاری تایید می‌شود."
+        confluence_grade = "A (MOMENTUM)"
+        score = min(95, int(macro_score * 0.5 + 45))
+    else:
+        recommended_setup = "pullback"
+        status_verdict = "CONFIRMED_PULLBACK_LIMIT"
+        reason = f"رژیم بازار بازگشت به میانگین (H={hurst}) همراه با همگرایی ماکروی تضعیف دلار ({macro_score}%) اردر لیمیت خرید در ۳٬۵۹۵ دلار را با برتری آماری تایید می‌کند."
+        confluence_grade = "A+ (PRIME_CONFLUENCE)"
+        score = min(98, int(macro_score * 0.5 + 48))
+
+    setup_explanations = {
+        "pullback": {
+            "status": "RECOMMENDED" if recommended_setup == "pullback" else "VALID",
+            "tag": "★ ستاپ منتخب اتوپایلوت (A+ Confluence)" if recommended_setup == "pullback" else "تایید ثانویه",
+            "score": score if recommended_setup == "pullback" else 85
+        },
+        "breakout": {
+            "status": "RECOMMENDED" if recommended_setup == "breakout" else "STANDBY",
+            "tag": "★ ستاپ منتخب اتوپایلوت (مومنتوم)" if recommended_setup == "breakout" else ("در انتظار تایید مومنتوم (H > 0.55)" if hurst < 0.55 else "معتبر"),
+            "score": score if recommended_setup == "breakout" else 68
+        },
+        "rejection": {
+            "status": "RECOMMENDED" if recommended_setup == "rejection" else "LOW_PROBABILITY",
+            "tag": "★ ستاپ منتخب اتوپایلوت (سقف آماری)" if recommended_setup == "rejection" else "ریسک بالا در خلاف جهت ضعف دلار",
+            "score": score if recommended_setup == "rejection" else 42
+        }
+    }
+
+    return {
+        "recommended_setup": recommended_setup,
+        "status_verdict": status_verdict,
+        "confluence_score": score,
+        "confluence_grade": confluence_grade,
+        "reason": reason,
+        "shield_status": shield_status,
+        "macro_bias": macro_bias,
+        "macro_score": macro_score,
+        "hurst_exponent": hurst,
+        "z_score": z_score,
+        "current_price": current_price,
+        "setups": setup_explanations,
+        "timestamp": datetime.datetime.now().strftime("%H:%M:%S")
+    }
+
 class ProfessionalTradingHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=os.path.dirname(os.path.abspath(__file__)), **kwargs)
@@ -426,6 +499,13 @@ class ProfessionalTradingHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header("Access-Control-Allow-Origin", "*")
             self.end_headers()
             self.wfile.write(json.dumps(quant_data).encode("utf-8"))
+        elif self.path.startswith("/api/autopilot"):
+            data = evaluate_autopilot()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(json.dumps(data).encode("utf-8"))
         else:
             return super().do_GET()
 
