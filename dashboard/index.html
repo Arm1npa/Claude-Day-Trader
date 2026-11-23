@@ -70,7 +70,7 @@
             <span dir="ltr" class="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 font-bold mono">XAUUSD</span>
             <span class="text-[10px] px-2 py-0.5 rounded bg-gray-800 text-gray-400">Gold Spot</span>
           </div>
-          <p class="text-xs text-gray-400 mt-0.5">سیستم ستاپ‌چین، تحلیل تکنیکال نهادی (SMC) و مدیریت ریسک حساب</p>
+          <p class="text-xs text-gray-400 mt-0.5">ستاپ‌چین بصری، رادار شاخص دلار و سپر هوشمند اخبار فارکس فکتوری</p>
         </div>
       </div>
 
@@ -93,7 +93,7 @@
           <span>نیویورک</span>
         </div>
         <div class="h-4 w-px bg-gray-800 mx-1"></div>
-        <span dir="ltr" class="mono text-xs text-amber-300 font-bold" id="clock-tehran">12:30:00</span>
+        <span dir="ltr" class="mono text-xs text-amber-300 font-bold" id="clock-tehran">12:45:00</span>
       </div>
 
       <!-- LIVE QUOTE TICKER -->
@@ -114,7 +114,110 @@
     </div>
   </header>
 
-  <!-- QUICK ACTION / WHAT TO DO NOW BANNER -->
+  <!-- TWO NEW POWER PILLARS: DXY RADAR (ITEM 2) & FOREX FACTORY NEWS SHIELD (ITEM 4) -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+    
+    <!-- PILLAR 2: DXY & US10Y MACRO CORRELATION RADAR (6 cols) -->
+    <div class="lg:col-span-6 bg-[#0d121f] border border-[#1a233a] rounded-2xl p-4 glow-card space-y-3">
+      <div class="flex items-center justify-between pb-2 border-b border-gray-800 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-400 animate-pulse"></span>
+          <h2 class="font-extrabold text-white text-sm">رادار همبستگی شاخص دلار و اوراق قرضه (DXY & US10Y)</h2>
+        </div>
+        <span dir="ltr" class="text-[10px] mono px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 font-bold" id="macro-badge">BULLISH CONFLUENCE</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 text-xs">
+        <!-- DXY TILE -->
+        <div class="p-3 rounded-xl bg-gray-950/80 border border-gray-800/80">
+          <div class="flex justify-between items-center text-gray-400 text-[11px] mb-1">
+            <span>شاخص دلار (DXY):</span>
+            <span dir="ltr" class="mono text-[10px] text-emerald-400 font-bold" id="dxy-trend">همبستگی معکوس -85%</span>
+          </div>
+          <div class="flex items-baseline justify-between">
+            <span dir="ltr" class="mono text-lg font-black text-white" id="dxy-price">103.73</span>
+            <span dir="ltr" class="mono text-xs font-bold text-emerald-400" id="dxy-change">-0.07% 🔻</span>
+          </div>
+          <span class="text-[10px] text-gray-500 block mt-1">تضعیف دلار = محرک صعود طلا</span>
+        </div>
+
+        <!-- US10Y YIELD TILE -->
+        <div class="p-3 rounded-xl bg-gray-950/80 border border-gray-800/80">
+          <div class="flex justify-between items-center text-gray-400 text-[11px] mb-1">
+            <span>اوراق ۱۰ ساله (US10Y):</span>
+            <span dir="ltr" class="mono text-[10px] text-emerald-400 font-bold" id="tnx-trend">ریزش بازدهی</span>
+          </div>
+          <div class="flex items-baseline justify-between">
+            <span dir="ltr" class="mono text-lg font-black text-white" id="tnx-price">4.91%</span>
+            <span dir="ltr" class="mono text-xs font-bold text-emerald-400" id="tnx-change">-2.77% 🔻</span>
+          </div>
+          <span class="text-[10px] text-gray-500 block mt-1">کاهش بازدهی = افزایش جذابیت طلا</span>
+        </div>
+      </div>
+
+      <!-- MACRO CONFLUENCE SUMMARY -->
+      <div class="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-900/40 flex items-center justify-between text-xs">
+        <div class="flex items-center gap-2">
+          <span class="text-emerald-400 font-bold">تاییدیه همگرایی ماکرو:</span>
+          <span class="text-gray-300 text-[11px]" id="macro-status-text">ضعف همزمان شاخص دلار و اوراق قرضه تاییدیه قدرتمندی برای خرید طلاست.</span>
+        </div>
+        <div class="shrink-0 mr-2">
+          <span dir="ltr" class="mono text-xs font-black px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" id="macro-score">92% تایید</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PILLAR 4: FOREX FACTORY NEWS SHIELD (6 cols) -->
+    <div class="lg:col-span-6 bg-[#0d121f] border border-[#1a233a] rounded-2xl p-4 glow-card space-y-3">
+      <div class="flex items-center justify-between pb-2 border-b border-gray-800 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" id="shield-indicator-dot"></span>
+          <h2 class="font-extrabold text-white text-sm">سپر محافظتی اخبار فارکس فکتوری (Forex Factory Shield)</h2>
+        </div>
+        <span dir="ltr" class="text-[10px] mono px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700 font-bold" id="shield-badge">SAFE TO TRADE</span>
+      </div>
+
+      <!-- SHIELD STATUS BANNER -->
+      <div class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-800/40 flex items-center justify-between text-xs" id="shield-box">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl" id="shield-icon">🛡️</span>
+          <div>
+            <span class="font-bold text-emerald-400 block" id="shield-title">سپر اخبار: وضعیت کاملاً امن (SAFE)</span>
+            <span class="text-[11px] text-gray-300 block mt-0.5" id="shield-desc">هیچ خبر قرمز پرریسکی برای دلار در ۶۰ دقیقه آینده نیست؛ معامله بلامانع است.</span>
+          </div>
+        </div>
+        <div class="text-left shrink-0 mr-2 mono text-[11px]" id="shield-next-timer">
+          <span class="text-gray-400 block text-[9px]">رویداد بعدی:</span>
+          <span class="font-bold text-amber-300" id="shield-next-time">ساعت 18:15 (Flash PMI)</span>
+        </div>
+      </div>
+
+      <!-- UPCOMING HIGH/MED ECONOMIC EVENTS LIST -->
+      <div class="space-y-1 text-xs">
+        <span class="text-[10px] text-gray-400 block">رویدادهای مهم اقتصادی پیش‌رو (به وقت تهران):</span>
+        <div class="grid grid-cols-2 gap-2" id="events-grid">
+          <div class="p-2 rounded-lg bg-gray-950/70 border border-gray-800 flex justify-between items-center text-[11px]">
+            <div>
+              <span class="text-amber-400 font-bold block">Flash Services PMI</span>
+              <span class="text-[10px] text-gray-400">ساعت 18:15 تهران</span>
+            </div>
+            <span dir="ltr" class="mono text-[10px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-300">Medium</span>
+          </div>
+
+          <div class="p-2 rounded-lg bg-gray-950/70 border border-gray-800 flex justify-between items-center text-[11px]">
+            <div>
+              <span class="text-gray-300 font-bold block">FOMC Member Williams</span>
+              <span class="text-[10px] text-gray-400">ساعت 00:30 بامداد</span>
+            </div>
+            <span dir="ltr" class="mono text-[10px] px-1.5 py-0.5 rounded bg-gray-900 text-gray-400">Low</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- QUICK ACTION / WHAT TO DO BANNER -->
   <div class="bg-gradient-to-r from-amber-950/40 via-yellow-950/20 to-emerald-950/40 border border-amber-500/30 rounded-2xl p-4 glow-card flex flex-col md:flex-row items-center justify-between gap-4">
     <div class="flex items-center gap-3 w-full md:w-auto">
       <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-xl shrink-0">
@@ -122,11 +225,11 @@
       </div>
       <div>
         <div class="flex items-center gap-2">
-          <span class="font-black text-sm text-white">الان باید چیکار کنی؟ (راهنمای گام‌به‌گام):</span>
-          <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">وضعیت: صعودی (Bullish)</span>
+          <span class="font-black text-sm text-white">راهنمای گام‌به‌گام کاشت اردر:</span>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">سیگنال فعال: خرید (Bullish)</span>
         </div>
         <p class="text-xs text-gray-300 mt-1 leading-relaxed">
-          طلا کف حمایتی ۳۵۰۰ دلار را حفظ کرده و در فاز صعودی است. یکی از ستاپ‌های زیر را انتخاب کنید تا اردر کامل محاسبه و آماده کاشت شود:
+          طلا سقف حمایتی ۳۵۰۰ دلار را حفظ کرده و ریزش دلار (DXY) از رشد آن حمایت می‌کند. یکی از ستاپ‌های زیر را انتخاب کنید:
         </p>
       </div>
     </div>
@@ -415,7 +518,6 @@
       direction: 'long'
     };
 
-    // Apply Presets
     function applyPreset(type) {
       ['pullback', 'breakout', 'rejection'].forEach(t => {
         const btn = document.getElementById(`p-${t}`);
@@ -524,7 +626,6 @@
       recalculateAll();
     }
 
-    // Precise Calculations
     function recalculateAll() {
       const balance = parseFloat(document.getElementById('inp-balance').value) || 5000;
       const riskPts = Math.abs(setup.entry - setup.stop);
@@ -538,7 +639,6 @@
       const rr = riskPts > 0 ? (rewardPts / riskPts).toFixed(2) : '0';
       document.getElementById('badge-rr').innerText = `1 : ${rr}`;
 
-      // XAUUSD: 1 Lot = 100 Oz. 1 pip ($0.10) per 0.01 lot = $0.10
       const targetRiskUSD = balance * (riskPercentage / 100.0);
       let calcLots = (riskPts > 0) ? (targetRiskUSD / (riskPts * 100)) : 0.01;
       calcLots = Math.max(0.01, Math.min(5.0, Math.round(calcLots * 100) / 100));
@@ -628,6 +728,87 @@
       }
     }
 
+    // FETCH MACRO & DXY RADAR
+    async function fetchMacro() {
+      try {
+        const res = await fetch('/api/macro');
+        if (res.ok) {
+          const m = await res.json();
+          document.getElementById('dxy-price').innerText = m.dxy.price.toFixed(2);
+          document.getElementById('dxy-change').innerText = `${m.dxy.change >= 0 ? '+' : ''}${m.dxy.change}% ${m.dxy.change < 0 ? '🔻' : '🔺'}`;
+          document.getElementById('dxy-change').className = `mono text-xs font-bold ${m.dxy.change < 0 ? 'text-emerald-400' : 'text-red-400'}`;
+
+          document.getElementById('tnx-price').innerText = `${m.us10y.yield.toFixed(2)}%`;
+          document.getElementById('tnx-change').innerText = `${m.us10y.change >= 0 ? '+' : ''}${m.us10y.change}% ${m.us10y.change < 0 ? '🔻' : '🔺'}`;
+          document.getElementById('tnx-change').className = `mono text-xs font-bold ${m.us10y.change < 0 ? 'text-emerald-400' : 'text-red-400'}`;
+
+          document.getElementById('macro-score').innerText = `${m.confluence.score}% تایید`;
+          document.getElementById('macro-status-text').innerText = m.confluence.status_text;
+          document.getElementById('macro-badge').innerText = m.confluence.bias;
+        }
+      } catch (e) {}
+    }
+
+    // FETCH FOREX FACTORY CALENDAR & NEWS SHIELD
+    async function fetchCalendar() {
+      try {
+        const res = await fetch('/api/calendar');
+        if (res.ok) {
+          const c = await res.json();
+          const shieldBox = document.getElementById('shield-box');
+          const shieldBadge = document.getElementById('shield-badge');
+          const shieldDot = document.getElementById('shield-indicator-dot');
+          const shieldTitle = document.getElementById('shield-title');
+          const shieldDesc = document.getElementById('shield-desc');
+          const shieldIcon = document.getElementById('shield-icon');
+
+          if (c.shield_status === 'DANGER') {
+            shieldBox.className = "p-3 rounded-xl bg-red-950/30 border border-red-700 flex items-center justify-between text-xs animate-pulse";
+            shieldBadge.className = "text-[10px] mono px-2.5 py-0.5 rounded-full bg-red-950 text-red-300 border border-red-700 font-bold";
+            shieldBadge.innerText = "SHIELD ARMED (DANGER)";
+            shieldDot.className = "w-2.5 h-2.5 rounded-full bg-red-500 animate-ping";
+            shieldTitle.innerText = c.shield_title;
+            shieldTitle.className = "font-bold text-red-400 block";
+            shieldIcon.innerText = "🚨";
+          } else if (c.shield_status === 'WARNING') {
+            shieldBox.className = "p-3 rounded-xl bg-amber-950/20 border border-amber-700 flex items-center justify-between text-xs";
+            shieldBadge.className = "text-[10px] mono px-2.5 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-700 font-bold";
+            shieldBadge.innerText = "UPCOMING EVENT";
+            shieldDot.className = "w-2.5 h-2.5 rounded-full bg-amber-400";
+            shieldTitle.innerText = c.shield_title;
+            shieldTitle.className = "font-bold text-amber-400 block";
+            shieldIcon.innerText = "⚠️";
+          } else {
+            shieldBox.className = "p-3 rounded-xl bg-emerald-950/20 border border-emerald-800/40 flex items-center justify-between text-xs";
+            shieldBadge.className = "text-[10px] mono px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700 font-bold";
+            shieldBadge.innerText = "SAFE TO TRADE";
+            shieldDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+            shieldTitle.innerText = c.shield_title;
+            shieldTitle.className = "font-bold text-emerald-400 block";
+            shieldIcon.innerText = "🛡️";
+          }
+          shieldDesc.innerText = c.shield_message;
+
+          if (c.next_event) {
+            document.getElementById('shield-next-time').innerText = `${c.next_event.time_tehran} (${c.next_event.title})`;
+          }
+
+          if (c.events && c.events.length > 0) {
+            const grid = document.getElementById('events-grid');
+            grid.innerHTML = c.events.slice(0, 4).map(e => `
+              <div class="p-2 rounded-lg bg-gray-950/70 border border-gray-800 flex justify-between items-center text-[11px]">
+                <div class="truncate mr-1">
+                  <span class="text-gray-200 font-bold block truncate">${e.title}</span>
+                  <span class="text-[10px] text-gray-400">ساعت ${e.time_tehran} تهران</span>
+                </div>
+                <span dir="ltr" class="mono text-[9px] px-1.5 py-0.5 rounded shrink-0 ${e.impact === 'High' ? 'bg-red-950 text-red-300 border border-red-800' : 'bg-amber-950 text-amber-300 border border-amber-800'}">${e.impact}</span>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (e) {}
+    }
+
     async function refreshData() {
       try {
         const res = await fetch('/api/gold');
@@ -640,11 +821,12 @@
           }
         }
       } catch (e) {}
+      fetchMacro();
+      fetchCalendar();
       recalculateAll();
       simulateMonteCarlo();
     }
 
-    // Init TradingView Widget
     function initTradingView() {
       const container = document.getElementById('tv-main-container');
       if (!container) return;
