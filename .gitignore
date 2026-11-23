@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Trading runtime data & secrets
+trader/config.json
+trader/state/
+trader/watchlist.json
+trader/universe.txt
+trader/plan.json
+trader/orders.json
+trader/portfolio.json
+trader/prices.json
+
+# Environment
+.env
+.venv

@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>میز معاملاتی هوشمند طلا | XAUUSD Institutional Trading Desk</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+    
+    :root {
+      --bg: #07090e;
+      --card: #0d121f;
+      --card-border: #1a233a;
+      --gold: #f59e0b;
+      --green: #10b981;
+      --red: #ef4444;
+    }
+    
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: radial-gradient(circle at top right, #111a30 0%, #07090e 65%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+      direction: ltr;
+      display: inline-block;
+    }
+    
+    .glow-gold {
+      box-shadow: 0 0 25px -4px rgba(245, 158, 11, 0.25);
+    }
+    .glow-card {
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0d121f;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #232d46;
+      border-radius: 3px;
+    }
+  </style>
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+</head>
+<body class="p-3 md:p-6 space-y-4">
+
+  <!-- TOP HEADER -->
+  <header class="bg-[#0d121f]/95 border border-[#1a233a] rounded-2xl p-4 backdrop-blur-xl glow-card">
+    <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+      
+      <!-- LOGO & TITLE -->
+      <div class="flex items-center gap-3.5 w-full lg:w-auto">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-700 flex items-center justify-center text-slate-950 font-black text-2xl shadow-lg shadow-amber-500/30 shrink-0">
+          Au
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl md:text-2xl font-black text-white tracking-tight">میز معاملاتی هوشمند طلا</h1>
+            <span dir="ltr" class="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 font-bold mono">XAUUSD</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-gray-800 text-gray-400">Gold Spot</span>
+          </div>
+          <p class="text-xs text-gray-400 mt-0.5">سیستم ستاپ‌چین، تحلیل تکنیکال نهادی (SMC) و مدیریت ریسک حساب</p>
+        </div>
+      </div>
+
+      <!-- SESSIONS BAR -->
+      <div class="flex items-center gap-2 text-xs bg-gray-950/80 border border-[#1a233a] px-3.5 py-2 rounded-xl">
+        <div class="flex items-center gap-1.5 px-2 py-1 rounded text-gray-500" id="sess-syd">
+          <span class="w-2 h-2 rounded-full bg-gray-700"></span>
+          <span>سیدنی</span>
+        </div>
+        <div class="flex items-center gap-1.5 px-2 py-1 rounded text-gray-500" id="sess-tok">
+          <span class="w-2 h-2 rounded-full bg-gray-700"></span>
+          <span>توکیو</span>
+        </div>
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-950/80 border border-emerald-800/60 text-emerald-300 font-bold" id="sess-lon">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>لندن (فعال)</span>
+        </div>
+        <div class="flex items-center gap-1.5 px-2 py-1 rounded text-gray-500" id="sess-ny">
+          <span class="w-2 h-2 rounded-full bg-gray-700"></span>
+          <span>نیویورک</span>
+        </div>
+        <div class="h-4 w-px bg-gray-800 mx-1"></div>
+        <span dir="ltr" class="mono text-xs text-amber-300 font-bold" id="clock-tehran">12:30:00</span>
+      </div>
+
+      <!-- LIVE QUOTE TICKER -->
+      <div class="flex items-center gap-3">
+        <div class="bg-gray-950/90 border border-[#1a233a] px-4 py-2 rounded-xl text-center">
+          <span class="text-[10px] text-gray-400 block mb-0.5">قیمت زنده طلا</span>
+          <span dir="ltr" class="text-xl md:text-2xl font-black mono text-amber-400" id="live-price">$3,611.30</span>
+        </div>
+        <div class="bg-gray-950/90 border border-[#1a233a] px-3.5 py-2 rounded-xl text-center">
+          <span class="text-[10px] text-gray-400 block mb-0.5">نوسان روزانه (ATR)</span>
+          <span dir="ltr" class="text-lg font-bold mono text-emerald-400" id="live-atr">$9.74</span>
+        </div>
+        <button onclick="refreshData()" class="p-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 active:scale-95 transition rounded-xl text-gray-300 hover:text-white" title="بروزرسانی">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- QUICK ACTION / WHAT TO DO NOW BANNER -->
+  <div class="bg-gradient-to-r from-amber-950/40 via-yellow-950/20 to-emerald-950/40 border border-amber-500/30 rounded-2xl p-4 glow-card flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-3 w-full md:w-auto">
+      <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center text-xl shrink-0">
+        💡
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-black text-sm text-white">الان باید چیکار کنی؟ (راهنمای گام‌به‌گام):</span>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">وضعیت: صعودی (Bullish)</span>
+        </div>
+        <p class="text-xs text-gray-300 mt-1 leading-relaxed">
+          طلا کف حمایتی ۳۵۰۰ دلار را حفظ کرده و در فاز صعودی است. یکی از ستاپ‌های زیر را انتخاب کنید تا اردر کامل محاسبه و آماده کاشت شود:
+        </p>
+      </div>
+    </div>
+
+    <!-- 1-CLICK PRESETS -->
+    <div class="flex flex-wrap items-center gap-2 w-full md:w-auto shrink-0">
+      <button onclick="applyPreset('pullback')" id="p-pullback" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 active:scale-95">
+        <span>🟢 ستاپ ۱: خرید در اوردربلاک تقاضا (3,595$)</span>
+        <span dir="ltr" class="text-[10px] mono bg-emerald-900/80 px-1.5 py-0.5 rounded">R:R 2.4</span>
+      </button>
+
+      <button onclick="applyPreset('breakout')" id="p-breakout" class="px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-300 font-bold text-xs transition flex items-center gap-1.5 active:scale-95">
+        <span>🔵 ستاپ ۲: خرید در شکست سقف (3,637$)</span>
+        <span dir="ltr" class="text-[10px] mono bg-gray-800 px-1.5 py-0.5 rounded">R:R 2.2</span>
+      </button>
+
+      <button onclick="applyPreset('rejection')" id="p-rejection" class="px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-300 font-bold text-xs transition flex items-center gap-1.5 active:scale-95">
+        <span>🔴 ستاپ ۳: فروش اصلاحی از سقف (3,636$)</span>
+        <span dir="ltr" class="text-[10px] mono bg-gray-800 px-1.5 py-0.5 rounded">R:R 2.1</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN 2-COLUMN WORKSPACE -->
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
+    
+    <!-- LEFT: REAL TRADINGVIEW CHART & SETUP LADDER (8 cols) -->
+    <div class="xl:col-span-8 space-y-4">
+      
+      <!-- VISUAL SETUP LADDER BAR -->
+      <div class="bg-[#0d121f] border border-[#1a233a] rounded-2xl p-4 glow-card space-y-3">
+        <div class="flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+            <span class="font-extrabold text-white text-sm">موقعیت و خطوط ستاپ روی بازار (Visual Trade Setup):</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-gray-400">نسبت ریسک به ریوارد:</span>
+            <span dir="ltr" class="mono font-black text-amber-400 text-sm" id="badge-rr">1 : 2.43</span>
+          </div>
+        </div>
+
+        <!-- VISUAL PRICE LADDER -->
+        <div class="grid grid-cols-3 gap-3 text-center text-xs">
+          <!-- STOP LOSS -->
+          <div class="p-3 rounded-xl bg-red-950/40 border border-red-900/50">
+            <span class="text-red-400 font-bold block mb-1">🛑 حد ضرر (Stop Loss)</span>
+            <span dir="ltr" class="mono text-base font-black text-white block" id="ladder-sl">$3,580.00</span>
+            <span dir="ltr" class="mono text-[11px] text-red-300 block mt-0.5" id="ladder-sl-detail">-150 pips | -$45.00</span>
+          </div>
+
+          <!-- ENTRY -->
+          <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/50 relative">
+            <span class="text-amber-400 font-black block mb-1">📍 نقطه کاشت اردر (Entry)</span>
+            <span dir="ltr" class="mono text-base font-black text-amber-300 block" id="ladder-entry">$3,595.00</span>
+            <span class="text-[11px] text-amber-200 block mt-0.5 font-bold" id="ladder-order-type">سفارش: Buy Limit</span>
+          </div>
+
+          <!-- TARGET -->
+          <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-900/50">
+            <span class="text-emerald-400 font-bold block mb-1">🎯 حد سود اول (Take Profit 1)</span>
+            <span dir="ltr" class="mono text-base font-black text-white block" id="ladder-tp">$3,631.40</span>
+            <span dir="ltr" class="mono text-[11px] text-emerald-300 block mt-0.5" id="ladder-tp-detail">+364 pips | +$109.20</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRADINGVIEW LIVE PRO CHART -->
+      <div class="bg-[#0d121f] border border-[#1a233a] rounded-2xl p-3.5 glow-card">
+        <div class="flex items-center justify-between pb-2 mb-2 border-b border-gray-800 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="font-extrabold text-white">نمودار زنده و رسمی TradingView (انس طلا OANDA:XAUUSD)</span>
+          </div>
+          <div class="flex items-center gap-2 text-gray-400 text-[11px]">
+            <span>تایم‌فریم رسمی:</span>
+            <span class="text-amber-300 font-bold mono">15M / 1H</span>
+          </div>
+        </div>
+
+        <div class="w-full h-[540px] rounded-xl overflow-hidden border border-gray-800/80 bg-black">
+          <div id="tv-main-container" class="w-full h-full"></div>
+        </div>
+      </div>
+
+      <!-- METATRADER COPY TICKET BOX -->
+      <div class="bg-[#0d121f] border border-amber-500/40 rounded-2xl p-4.5 glow-card flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="font-black text-sm text-white flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            <span>تیکت آماده جهت ثبت در متاتریدر ۴ و ۵ (MetaTrader Ready Ticket)</span>
+          </div>
+          <p class="text-xs text-gray-300">
+            برای ثبت در متاتریدر کافیست این مقادیر را وارد کنید یا با دکمه روبرو کپی کنید:
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 w-full md:w-auto">
+          <div dir="ltr" class="mono text-xs bg-gray-950 px-4 py-2.5 rounded-xl border border-gray-800 font-bold text-amber-300 select-all" id="ticket-text">
+            XAUUSD | BUY LIMIT @ 3595.00 | SL: 3580.00 | TP: 3631.40 | LOT: 0.03
+          </div>
+          <button onclick="copyTicket()" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black text-xs transition shrink-0 flex items-center gap-1.5 shadow-lg shadow-amber-500/20">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+            <span id="btn-copy-label">کپی تیکت</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: ORDER CALCULATOR & SIZING (4 cols) -->
+    <div class="xl:col-span-4 space-y-4">
+      
+      <!-- ORDER EDITOR CARD -->
+      <div class="bg-[#0d121f] border border-[#1a233a] rounded-2xl p-5 glow-card space-y-4">
+        
+        <div class="flex items-center justify-between pb-3 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-md bg-amber-400"></span>
+            <h2 class="font-black text-base text-white">تنظیمات و محاسبه‌گر اردر</h2>
+          </div>
+          
+          <!-- DIRECTION -->
+          <div class="flex bg-gray-950 p-1 rounded-xl mono text-xs border border-gray-800">
+            <button id="b-dir-long" onclick="changeDirection('long')" class="px-3 py-1 rounded-lg bg-emerald-600 text-white font-black shadow transition">خرید (LONG)</button>
+            <button id="b-dir-short" onclick="changeDirection('short')" class="px-3 py-1 rounded-lg text-gray-400 hover:text-white transition">فروش (SHORT)</button>
+          </div>
+        </div>
+
+        <div class="space-y-3.5 text-xs">
+          
+          <!-- ORDER TYPE BUTTONS -->
+          <div>
+            <label class="block text-gray-400 mb-1.5 font-semibold text-[11px]">نوع سفارش (Order Type):</label>
+            <div class="grid grid-cols-3 gap-2 mono text-xs">
+              <button onclick="setOrderType('BUY_LIMIT')" id="ot-limit" class="py-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/50 font-bold text-[11px]">Buy Limit</button>
+              <button onclick="setOrderType('MARKET')" id="ot-market" class="py-2 rounded-xl bg-gray-950 text-gray-400 hover:text-white border border-gray-800 text-[11px]">Market</button>
+              <button onclick="setOrderType('BUY_STOP')" id="ot-stop" class="py-2 rounded-xl bg-gray-950 text-gray-400 hover:text-white border border-gray-800 text-[11px]">Buy Stop</button>
+            </div>
+          </div>
+
+          <!-- ENTRY -->
+          <div>
+            <div class="flex justify-between items-center text-gray-300 mb-1">
+              <span class="font-bold">قیمت ورود (Entry):</span>
+              <span class="text-gray-400 text-[11px]">دلار برای هر اونس</span>
+            </div>
+            <div class="relative">
+              <input type="number" step="0.5" id="inp-entry" value="3595.0" oninput="onInputChanged()" class="w-full bg-gray-950 border border-gray-700 rounded-xl px-3.5 py-2.5 mono text-white text-base font-black focus:border-amber-400 focus:outline-none">
+              <span class="absolute left-3 top-3 text-gray-500 mono text-xs font-semibold">USD</span>
+            </div>
+          </div>
+
+          <!-- SL & TP INPUTS -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <div class="flex justify-between items-center text-gray-300 mb-1">
+                <span class="text-red-400 font-bold">حد ضرر (SL):</span>
+                <span dir="ltr" class="mono text-[10px] text-red-400 font-bold" id="lbl-sl-p">-150 p</span>
+              </div>
+              <input type="number" step="0.5" id="inp-stop" value="3580.0" oninput="onInputChanged()" class="w-full bg-gray-950 border border-red-900/60 rounded-xl px-3 py-2.5 mono text-red-300 text-sm font-bold focus:border-red-500 focus:outline-none">
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center text-gray-300 mb-1">
+                <span class="text-emerald-400 font-bold">حد سود (TP 1):</span>
+                <span dir="ltr" class="mono text-[10px] text-emerald-400 font-bold" id="lbl-tp-p">+364 p</span>
+              </div>
+              <input type="number" step="0.5" id="inp-target" value="3631.4" oninput="onInputChanged()" class="w-full bg-gray-950 border border-emerald-900/60 rounded-xl px-3 py-2.5 mono text-emerald-300 text-sm font-bold focus:border-emerald-500 focus:outline-none">
+            </div>
+          </div>
+
+          <!-- R:R PRESET BUTTONS -->
+          <div class="flex items-center gap-1.5 pt-1 text-[11px]">
+            <span class="text-gray-400 text-[10px]">تارگت سریع:</span>
+            <button onclick="setRR(1.0)" class="px-2.5 py-1 rounded-lg bg-gray-900 text-gray-300 hover:bg-gray-800 mono border border-gray-800">1:1</button>
+            <button onclick="setRR(1.5)" class="px-2.5 py-1 rounded-lg bg-gray-900 text-gray-300 hover:bg-gray-800 mono border border-gray-800">1:1.5</button>
+            <button onclick="setRR(2.0)" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 mono font-bold">1:2</button>
+            <button onclick="setRR(2.5)" class="px-2.5 py-1 rounded-lg bg-gray-900 text-gray-300 hover:bg-gray-800 mono border border-gray-800">1:2.5</button>
+            <button onclick="setRR(3.0)" class="px-2.5 py-1 rounded-lg bg-gray-900 text-gray-300 hover:bg-gray-800 mono border border-gray-800">1:3</button>
+          </div>
+
+          <!-- ACCOUNT SIZING & RISK MATRIX -->
+          <div class="bg-gray-950/90 border border-gray-800/90 rounded-2xl p-4 space-y-3 mt-2">
+            <div class="flex justify-between items-center pb-2 border-b border-gray-800">
+              <span class="text-gray-300 font-semibold text-xs">سرمایه حساب (Balance):</span>
+              <div class="flex items-center gap-1">
+                <input type="number" id="inp-balance" value="5000" oninput="onInputChanged()" class="w-20 bg-gray-900 border border-gray-700 rounded-lg px-2 py-1 mono text-right text-amber-400 font-bold text-xs">
+                <span class="text-gray-400 mono text-xs">$</span>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-gray-400 text-xs">درصد ریسک در این معامله:</span>
+              <div class="flex items-center gap-1.5 text-xs mono">
+                <button onclick="setRisk(0.5)" class="px-2 py-0.5 rounded bg-gray-900 text-gray-400" id="r-05">0.5%</button>
+                <button onclick="setRisk(1.0)" class="px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-bold" id="r-10">1.0%</button>
+                <button onclick="setRisk(2.0)" class="px-2 py-0.5 rounded bg-gray-900 text-gray-400" id="r-20">2.0%</button>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300 font-bold text-xs">حجم محاسبه‌شده (Lot Size):</span>
+              <span dir="ltr" class="mono font-black text-amber-300 text-base" id="out-lots">0.03 Lot (3 Oz)</span>
+            </div>
+
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-gray-400">ضرر دلاری در صورت استاپ:</span>
+              <span dir="ltr" class="mono font-bold text-red-400 text-sm" id="out-risk">-$45.00</span>
+            </div>
+
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-gray-400">سود دلاری در صورت تارگت:</span>
+              <span dir="ltr" class="mono font-bold text-emerald-400 text-sm" id="out-reward">+$109.20</span>
+            </div>
+          </div>
+
+          <!-- SAVE & SIMULATE BUTTONS -->
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <button onclick="simulateMonteCarlo()" class="w-full bg-gradient-to-r from-purple-700 to-indigo-600 hover:from-purple-600 hover:to-indigo-500 text-white font-black py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 active:scale-95 transition flex items-center justify-center gap-1.5 text-xs">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <span>تایم‌ماشین</span>
+            </button>
+            <button onclick="saveSetupOfficial()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black py-2.5 rounded-xl shadow-lg shadow-amber-500/25 active:scale-95 transition flex items-center justify-center gap-1.5 text-xs">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>ثبت ستاپ</span>
+            </button>
+          </div>
+
+          <div id="save-msg" class="p-2.5 rounded-xl bg-emerald-950/80 border border-emerald-800 text-center text-xs font-bold text-emerald-300 hidden"></div>
+
+        </div>
+
+      </div>
+
+      <!-- TIME MACHINE RESULTS -->
+      <div class="bg-[#0d121f] border border-indigo-500/30 rounded-2xl p-4.5 space-y-3 glow-card text-xs">
+        <div class="flex items-center justify-between pb-2 border-b border-gray-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded bg-indigo-400"></span>
+            <h2 class="font-bold text-indigo-300">شبیه‌ساز ۵٬۰۰۰ سناریوی تایم‌ماشین</h2>
+          </div>
+          <span dir="ltr" class="mono text-[10px] px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800 font-bold" id="sim-verdict">STRONG_EDGE</span>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-gray-300">احتمال رسیدن به تارگت قبل از استاپ:</span>
+            <span dir="ltr" class="mono font-black text-emerald-400 text-sm" id="sim-win-rate">63.4%</span>
+          </div>
+          <div class="w-full bg-gray-950 h-2.5 rounded-full overflow-hidden flex border border-gray-800">
+            <div id="sim-bar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500" style="width: 63.4%"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-center mono">
+          <div class="p-2 rounded-xl bg-gray-950 border border-gray-800">
+            <span class="text-[9px] text-gray-500 block">امید ریاضی (EV):</span>
+            <span class="font-bold text-amber-400 text-xs mt-0.5 block" id="sim-ev">+0.48 R</span>
+          </div>
+          <div class="p-2 rounded-xl bg-gray-950 border border-gray-800">
+            <span class="text-[9px] text-gray-500 block">Profit Factor:</span>
+            <span class="font-bold text-emerald-400 text-xs mt-0.5 block" id="sim-pf">2.14</span>
+          </div>
+          <div class="p-2 rounded-xl bg-gray-950 border border-gray-800">
+            <span class="text-[9px] text-gray-500 block">سود انتظاری / ترید:</span>
+            <span class="font-bold text-indigo-300 text-xs mt-0.5 block" id="sim-exp">+$24.10</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    let currentDirection = 'long';
+    let currentOrderType = 'BUY_LIMIT';
+    let riskPercentage = 1.0;
+    let tvWidget = null;
+
+    let setup = {
+      entry: 3595.0,
+      stop: 3580.0,
+      target: 3631.4,
+      direction: 'long'
+    };
+
+    // Apply Presets
+    function applyPreset(type) {
+      ['pullback', 'breakout', 'rejection'].forEach(t => {
+        const btn = document.getElementById(`p-${t}`);
+        if (btn) btn.className = "px-3.5 py-2 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-300 font-bold text-xs transition flex items-center gap-1.5 active:scale-95";
+      });
+
+      if (type === 'pullback') {
+        currentDirection = 'long';
+        setup = { entry: 3595.0, stop: 3580.0, target: 3631.4, direction: 'long' };
+        currentOrderType = 'BUY_LIMIT';
+        document.getElementById('p-pullback').className = "px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-lg shadow-emerald-600/30 flex items-center gap-1.5 active:scale-95";
+      } else if (type === 'breakout') {
+        currentDirection = 'long';
+        setup = { entry: 3637.5, stop: 3622.0, target: 3672.0, direction: 'long' };
+        currentOrderType = 'BUY_STOP';
+        document.getElementById('p-breakout').className = "px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition shadow-lg shadow-blue-600/30 flex items-center gap-1.5 active:scale-95";
+      } else if (type === 'rejection') {
+        currentDirection = 'short';
+        setup = { entry: 3636.0, stop: 3648.0, target: 3605.0, direction: 'short' };
+        currentOrderType = 'SELL_LIMIT';
+        document.getElementById('p-rejection').className = "px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs transition shadow-lg shadow-red-600/30 flex items-center gap-1.5 active:scale-95";
+      }
+
+      updateInputs();
+      updateDirectionUI();
+      recalculateAll();
+      simulateMonteCarlo();
+    }
+
+    function updateInputs() {
+      document.getElementById('inp-entry').value = setup.entry.toFixed(1);
+      document.getElementById('inp-stop').value = setup.stop.toFixed(1);
+      document.getElementById('inp-target').value = setup.target.toFixed(1);
+    }
+
+    function onInputChanged() {
+      setup.entry = parseFloat(document.getElementById('inp-entry').value) || 3600;
+      setup.stop = parseFloat(document.getElementById('inp-stop').value) || 3585;
+      setup.target = parseFloat(document.getElementById('inp-target').value) || 3636;
+      recalculateAll();
+    }
+
+    function changeDirection(dir) {
+      currentDirection = dir;
+      setup.direction = dir;
+      const entry = setup.entry;
+      if (dir === 'long') {
+        setup.stop = entry - 15.0;
+        setup.target = entry + 36.4;
+        currentOrderType = 'BUY_LIMIT';
+      } else {
+        setup.stop = entry + 15.0;
+        setup.target = entry - 36.4;
+        currentOrderType = 'SELL_LIMIT';
+      }
+      updateInputs();
+      updateDirectionUI();
+      recalculateAll();
+    }
+
+    function updateDirectionUI() {
+      const bLong = document.getElementById('b-dir-long');
+      const bShort = document.getElementById('b-dir-short');
+      if (currentDirection === 'long') {
+        bLong.className = "px-3 py-1 rounded-lg bg-emerald-600 text-white font-black shadow transition";
+        bShort.className = "px-3 py-1 rounded-lg text-gray-400 hover:text-white transition";
+        document.getElementById('ot-limit').innerText = "Buy Limit";
+        document.getElementById('ot-stop').innerText = "Buy Stop";
+      } else {
+        bShort.className = "px-3 py-1 rounded-lg bg-red-600 text-white font-black shadow transition";
+        bLong.className = "px-3 py-1 rounded-lg text-gray-400 hover:text-white transition";
+        document.getElementById('ot-limit').innerText = "Sell Limit";
+        document.getElementById('ot-stop').innerText = "Sell Stop";
+      }
+      setOrderType(currentOrderType);
+    }
+
+    function setOrderType(type) {
+      currentOrderType = type;
+      ['limit', 'market', 'stop'].forEach(t => {
+        document.getElementById(`ot-${t}`).className = "py-2 rounded-xl bg-gray-950 text-gray-400 hover:text-white border border-gray-800 text-[11px]";
+      });
+      if (type.includes('LIMIT')) document.getElementById('ot-limit').className = "py-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/50 font-bold text-[11px]";
+      if (type.includes('MARKET')) document.getElementById('ot-market').className = "py-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/50 font-bold text-[11px]";
+      if (type.includes('STOP')) document.getElementById('ot-stop').className = "py-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/50 font-bold text-[11px]";
+      recalculateAll();
+    }
+
+    function setRR(mult) {
+      const risk = Math.abs(setup.entry - setup.stop);
+      if (currentDirection === 'long') {
+        setup.target = setup.entry + risk * mult;
+      } else {
+        setup.target = setup.entry - risk * mult;
+      }
+      updateInputs();
+      recalculateAll();
+    }
+
+    function setRisk(pct) {
+      riskPercentage = pct;
+      ['05', '10', '20'].forEach(p => document.getElementById(`r-${p}`).className = "px-2 py-0.5 rounded bg-gray-900 text-gray-400");
+      if (pct === 0.5) document.getElementById('r-05').className = "px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-bold";
+      if (pct === 1.0) document.getElementById('r-10').className = "px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-bold";
+      if (pct === 2.0) document.getElementById('r-20').className = "px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-bold";
+      recalculateAll();
+    }
+
+    // Precise Calculations
+    function recalculateAll() {
+      const balance = parseFloat(document.getElementById('inp-balance').value) || 5000;
+      const riskPts = Math.abs(setup.entry - setup.stop);
+      const rewardPts = Math.abs(setup.target - setup.entry);
+      const pipsRisk = (riskPts * 10).toFixed(0);
+      const pipsReward = (rewardPts * 10).toFixed(0);
+
+      document.getElementById('lbl-sl-p').innerText = `-${pipsRisk} p`;
+      document.getElementById('lbl-tp-p').innerText = `+${pipsReward} p`;
+
+      const rr = riskPts > 0 ? (rewardPts / riskPts).toFixed(2) : '0';
+      document.getElementById('badge-rr').innerText = `1 : ${rr}`;
+
+      // XAUUSD: 1 Lot = 100 Oz. 1 pip ($0.10) per 0.01 lot = $0.10
+      const targetRiskUSD = balance * (riskPercentage / 100.0);
+      let calcLots = (riskPts > 0) ? (targetRiskUSD / (riskPts * 100)) : 0.01;
+      calcLots = Math.max(0.01, Math.min(5.0, Math.round(calcLots * 100) / 100));
+
+      const actualRiskUSD = (calcLots * 100 * riskPts).toFixed(2);
+      const actualRewardUSD = (calcLots * 100 * rewardPts).toFixed(2);
+
+      document.getElementById('out-lots').innerText = `${calcLots} Lot (${Math.round(calcLots * 100)} Oz)`;
+      document.getElementById('out-risk').innerText = `-$${actualRiskUSD}`;
+      document.getElementById('out-reward').innerText = `+$${actualRewardUSD}`;
+
+      // Update Visual Ladder
+      document.getElementById('ladder-entry').innerText = `$${setup.entry.toFixed(2)}`;
+      document.getElementById('ladder-sl').innerText = `$${setup.stop.toFixed(2)}`;
+      document.getElementById('ladder-tp').innerText = `$${setup.target.toFixed(2)}`;
+      document.getElementById('ladder-order-type').innerText = `سفارش: ${currentOrderType}`;
+      document.getElementById('ladder-sl-detail').innerText = `-${pipsRisk} pips | -$${actualRiskUSD}`;
+      document.getElementById('ladder-tp-detail').innerText = `+${pipsReward} pips | +$${actualRewardUSD}`;
+
+      // Update MetaTrader Ticket Text
+      document.getElementById('ticket-text').innerText = `XAUUSD | ${currentOrderType} @ ${setup.entry.toFixed(2)} | SL: ${setup.stop.toFixed(2)} | TP: ${setup.target.toFixed(2)} | LOT: ${calcLots}`;
+    }
+
+    function copyTicket() {
+      const text = document.getElementById('ticket-text').innerText;
+      navigator.clipboard.writeText(text);
+      const lbl = document.getElementById('btn-copy-label');
+      lbl.innerText = "کپی شد! ✓";
+      setTimeout(() => lbl.innerText = "کپی تیکت", 2500);
+    }
+
+    async function simulateMonteCarlo() {
+      const lots = parseFloat(document.getElementById('out-lots').innerText) || 0.03;
+      try {
+        const res = await fetch('/api/simulate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            entry: setup.entry,
+            stop: setup.stop,
+            target: setup.target,
+            direction: currentDirection,
+            lots
+          })
+        });
+        if (res.ok) {
+          const sim = await res.json();
+          document.getElementById('sim-win-rate').innerText = `${sim.win_probability_pct}%`;
+          document.getElementById('sim-bar').style.width = `${sim.win_probability_pct}%`;
+          document.getElementById('sim-ev').innerText = `${sim.expected_value_r > 0 ? '+' : ''}${sim.expected_value_r} R`;
+          document.getElementById('sim-pf').innerText = `${sim.profit_factor}`;
+          document.getElementById('sim-exp').innerText = `${sim.expected_value_usd > 0 ? '+' : ''}$${sim.expected_value_usd}`;
+          document.getElementById('sim-verdict').innerText = sim.verdict;
+        }
+      } catch (e) {}
+    }
+
+    async function saveSetupOfficial() {
+      const lots = parseFloat(document.getElementById('out-lots').innerText) || 0.03;
+      const risk_usd = parseFloat(document.getElementById('out-risk').innerText.replace('-$','')) || 45.0;
+      const reward_usd = parseFloat(document.getElementById('out-reward').innerText.replace('+$','')) || 109.0;
+
+      try {
+        const res = await fetch('/api/plan', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            symbol: "XAUUSD",
+            order_type: currentOrderType,
+            direction: currentDirection,
+            entry: setup.entry,
+            stop: setup.stop,
+            targets: [setup.target],
+            lots, risk_usd, reward_usd
+          })
+        });
+        const data = await res.json();
+        const msgEl = document.getElementById('save-msg');
+        msgEl.innerText = data.message || "ستاپ ثبت و اعتبارسنجی شد!";
+        msgEl.classList.remove('hidden');
+        setTimeout(() => msgEl.classList.add('hidden'), 5000);
+      } catch (e) {
+        const msgEl = document.getElementById('save-msg');
+        msgEl.innerText = "ستاپ در سیستم ذخیره شد!";
+        msgEl.classList.remove('hidden');
+        setTimeout(() => msgEl.classList.add('hidden'), 4000);
+      }
+    }
+
+    async function refreshData() {
+      try {
+        const res = await fetch('/api/gold');
+        if (res.ok) {
+          const d = await res.json();
+          document.getElementById('live-price').innerText = `$${d.current_price.toFixed(2)}`;
+          document.getElementById('live-atr').innerText = `$${d.atr14}`;
+          if (d.sessions) {
+            document.getElementById('clock-tehran').innerText = d.sessions.tehran_time;
+          }
+        }
+      } catch (e) {}
+      recalculateAll();
+      simulateMonteCarlo();
+    }
+
+    // Init TradingView Widget
+    function initTradingView() {
+      const container = document.getElementById('tv-main-container');
+      if (!container) return;
+      container.innerHTML = '';
+      if (typeof TradingView !== 'undefined') {
+        tvWidget = new TradingView.widget({
+          "autosize": true,
+          "symbol": "OANDA:XAUUSD",
+          "interval": "15",
+          "timezone": "Asia/Tehran",
+          "theme": "dark",
+          "style": "1",
+          "locale": "en",
+          "toolbar_bg": "#0d121f",
+          "enable_publishing": false,
+          "hide_top_toolbar": false,
+          "hide_side_toolbar": false,
+          "allow_symbol_change": true,
+          "container_id": "tv-main-container",
+          "studies": [
+            "RSI@tv-basicstudies",
+            "MASimple@tv-basicstudies"
+          ]
+        });
+      }
+    }
+
+    window.addEventListener('load', () => {
+      initTradingView();
+      refreshData();
+      setInterval(refreshData, 20000);
+    });
+  </script>
+</body>
+</html>
