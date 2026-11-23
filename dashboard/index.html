@@ -217,6 +217,167 @@
 
   </div>
 
+  <!-- SECTION 3: QUANTITATIVE FINANCE LAB (FINANCE QUANT ENGINE) -->
+  <div class="bg-[#0d121f] border border-purple-900/40 rounded-2xl p-4.5 glow-card space-y-4">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-gray-800">
+      <div class="flex items-center gap-2.5">
+        <span class="w-3 h-3 rounded-md bg-purple-500 animate-pulse"></span>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="font-black text-white text-sm sm:text-base">آزمایشگاه ریاضیات مالی و هوش کمّی (Quantitative Finance Lab)</h2>
+            <span dir="ltr" class="mono text-[10px] px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-700 font-bold">QUANT ENGINE v2.0</span>
+          </div>
+          <p class="text-[11px] text-gray-400 mt-0.5">
+            تحلیل زنده رژیم بازار با ضریب هورست، انحراف معیار زی‌اسکور، نیمه‌عمر فرآیند اورنشتاین-اولنبک و ارزش در معرض ریسک (VaR)
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <span dir="ltr" class="mono text-xs px-2.5 py-1 rounded-xl bg-purple-950/80 text-purple-300 border border-purple-800 font-bold flex items-center gap-1.5" id="quant-verdict-badge">
+          <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
+          <span id="quant-verdict-text">QUANT CONFIRMED</span>
+        </span>
+        <button onclick="fetchQuantData()" class="px-2.5 py-1 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-300 transition text-xs flex items-center gap-1 active:scale-95" title="به‌روزرسانی محاسبات کوانت">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          <span>محاسبه مجدد</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 4 QUANT TILES -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+      
+      <!-- TILE 1: HURST EXPONENT (REGIME DETECTION) -->
+      <div class="p-3.5 rounded-xl bg-gray-950/80 border border-gray-800/80 space-y-2 relative overflow-hidden">
+        <div class="flex justify-between items-center text-gray-400 text-[11px]">
+          <span class="font-bold flex items-center gap-1.5">
+            <span class="text-amber-400">⚡</span>
+            <span>ضریب هورست (Hurst Exponent):</span>
+          </span>
+          <span dir="ltr" class="mono text-[10px] px-1.5 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-800/60" id="q-hurst-badge">H = 0.524</span>
+        </div>
+
+        <div class="flex items-baseline justify-between">
+          <span dir="ltr" class="mono text-2xl font-black text-white" id="q-hurst-val">0.524</span>
+          <span class="text-[11px] font-extrabold text-amber-300" id="q-regime-name">رژیم رونددار (Trending)</span>
+        </div>
+
+        <!-- HURST GAUGE BAR -->
+        <div class="space-y-1">
+          <div class="w-full bg-gray-900 h-2 rounded-full overflow-hidden flex border border-gray-800 relative">
+            <div class="w-1/2 bg-blue-900/40 border-r border-gray-700" title="Mean Reverting (H < 0.5)"></div>
+            <div class="w-1/2 bg-amber-900/40" title="Trending (H > 0.5)"></div>
+            <div id="q-hurst-marker" class="absolute top-0 bottom-0 w-1.5 bg-amber-400 shadow-md shadow-amber-400/50 transition-all duration-500" style="left: 52.4%;"></div>
+          </div>
+          <div class="flex justify-between text-[9px] text-gray-500 mono">
+            <span>0.0 بازگشت به میانگین</span>
+            <span class="text-gray-400">0.5 تصادفی</span>
+            <span>رونددار 1.0</span>
+          </div>
+        </div>
+
+        <span class="text-[10px] text-gray-400 block pt-1 border-t border-gray-900" id="q-regime-desc">
+          حرکت ادامه‌دار است؛ ورود در شکست سقف (Breakout) دارای برتری آماری است.
+        </span>
+      </div>
+
+      <!-- TILE 2: Z-SCORE (FAIR VALUE DEVIATION) -->
+      <div class="p-3.5 rounded-xl bg-gray-950/80 border border-gray-800/80 space-y-2">
+        <div class="flex justify-between items-center text-gray-400 text-[11px]">
+          <span class="font-bold flex items-center gap-1.5">
+            <span class="text-emerald-400">📐</span>
+            <span>زی‌اسکور انحراف (Z-Score):</span>
+          </span>
+          <span dir="ltr" class="mono text-[10px] px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-800/60" id="q-zscore-badge">+0.73 σ</span>
+        </div>
+
+        <div class="flex items-baseline justify-between">
+          <span dir="ltr" class="mono text-2xl font-black text-white" id="q-zscore-val">+0.73 σ</span>
+          <span class="text-[11px] font-extrabold text-emerald-300" id="q-zscore-status">محدوده منصفانه (Fair)</span>
+        </div>
+
+        <div class="space-y-1">
+          <div class="flex justify-between text-[10px] text-gray-400">
+            <span>میانگین ۲۰ دوره‌ای:</span>
+            <span dir="ltr" class="mono font-bold text-gray-200" id="q-mean-val">3,618.08 $</span>
+          </div>
+          <div class="flex justify-between text-[10px] text-gray-400">
+            <span>انحراف معیار (Std Dev):</span>
+            <span dir="ltr" class="mono font-bold text-gray-200" id="q-std-val">±7.95 $</span>
+          </div>
+        </div>
+
+        <span class="text-[10px] text-gray-400 block pt-1 border-t border-gray-900" id="q-zscore-desc">
+          قیمت درون باند تعادلی ۱ سیگما قرار دارد؛ بدون اشباع خرید یا فروش حاد.
+        </span>
+      </div>
+
+      <!-- TILE 3: ORNSTEIN-UHLENBECK HALF-LIFE -->
+      <div class="p-3.5 rounded-xl bg-gray-950/80 border border-gray-800/80 space-y-2">
+        <div class="flex justify-between items-center text-gray-400 text-[11px]">
+          <span class="font-bold flex items-center gap-1.5">
+            <span class="text-purple-400">⏳</span>
+            <span>نیمه‌عمر فرآیند (OU Half-Life):</span>
+          </span>
+          <span dir="ltr" class="mono text-[10px] px-1.5 py-0.5 rounded bg-purple-950/80 text-purple-300 border border-purple-800/60" id="q-hl-bars">77.9 Bars</span>
+        </div>
+
+        <div class="flex items-baseline justify-between">
+          <span dir="ltr" class="mono text-2xl font-black text-purple-300" id="q-hl-hours">19.5 h</span>
+          <span class="text-[11px] font-extrabold text-gray-300">زمان اصلاح به تعادل</span>
+        </div>
+
+        <div class="space-y-1">
+          <div class="flex justify-between text-[10px] text-gray-400">
+            <span>مدل بازگشت:</span>
+            <span class="text-purple-300 font-semibold">Ornstein-Uhlenbeck</span>
+          </div>
+          <div class="flex justify-between text-[10px] text-gray-400">
+            <span>تعداد کندل ۱۵ دقیقه:</span>
+            <span dir="ltr" class="mono font-bold text-gray-200" id="q-hl-bars-sub">~78 کندل</span>
+          </div>
+        </div>
+
+        <span class="text-[10px] text-gray-400 block pt-1 border-t border-gray-900">
+          سرعت تخلیه نوسانات و بازگشت نصف انحراف قیمت به خط تعادل آماری.
+        </span>
+      </div>
+
+      <!-- TILE 4: VALUE-AT-RISK (VaR) & KELLY CRITERION -->
+      <div class="p-3.5 rounded-xl bg-gray-950/80 border border-gray-800/80 space-y-2">
+        <div class="flex justify-between items-center text-gray-400 text-[11px]">
+          <span class="font-bold flex items-center gap-1.5">
+            <span class="text-red-400">🛡️</span>
+            <span>ریسک آماری (VaR & Kelly):</span>
+          </span>
+          <span dir="ltr" class="mono text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 text-red-300 border border-red-800/60" id="q-var-badge">95% Conf.</span>
+        </div>
+
+        <div class="flex items-baseline justify-between">
+          <span dir="ltr" class="mono text-2xl font-black text-red-400" id="q-var95-val">-$39.27</span>
+          <span class="text-[11px] font-extrabold text-gray-300" id="q-var-lot-lbl">1-Day VaR (0.03 Lot)</span>
+        </div>
+
+        <div class="space-y-1">
+          <div class="flex justify-between text-[10px] text-gray-400">
+            <span>حداکثر افت آماری (VaR 99%):</span>
+            <span dir="ltr" class="mono font-bold text-red-300" id="q-var99-val">-$55.50</span>
+          </div>
+          <div class="flex justify-between text-[10px] text-gray-400">
+            <span>تخصیص بهینه کلی (Quarter Kelly):</span>
+            <span dir="ltr" class="mono font-bold text-emerald-400" id="q-kelly-val">5.0% سرمایه</span>
+          </div>
+        </div>
+
+        <span class="text-[10px] text-emerald-400 block pt-1 border-t border-gray-900" id="q-var-evaluation">
+          ✓ حد ضرر انتخابی ($45) متناسب با بازه نوسان آماری طلاست.
+        </span>
+      </div>
+
+    </div>
+  </div>
+
   <!-- QUICK ACTION / WHAT TO DO BANNER -->
   <div class="bg-gradient-to-r from-amber-950/40 via-yellow-950/20 to-emerald-950/40 border border-amber-500/30 rounded-2xl p-4 glow-card flex flex-col md:flex-row items-center justify-between gap-4">
     <div class="flex items-center gap-3 w-full md:w-auto">
@@ -660,6 +821,11 @@
 
       // Update MetaTrader Ticket Text
       document.getElementById('ticket-text').innerText = `XAUUSD | ${currentOrderType} @ ${setup.entry.toFixed(2)} | SL: ${setup.stop.toFixed(2)} | TP: ${setup.target.toFixed(2)} | LOT: ${calcLots}`;
+      
+      // Update Quant VaR for active lot size
+      if (typeof fetchQuantData === 'function') {
+        fetchQuantData();
+      }
     }
 
     function copyTicket() {
@@ -809,6 +975,73 @@
       } catch (e) {}
     }
 
+    // FETCH QUANTITATIVE FINANCE LAB METRICS
+    async function fetchQuantData() {
+      try {
+        const balance = document.getElementById('inp-balance')?.value || 5000;
+        const lots = parseFloat(document.getElementById('out-lots')?.innerText) || 0.03;
+        const res = await fetch(`/api/quant?lots=${lots}&equity=${balance}`);
+        if (res.ok) {
+          const q = await res.json();
+          if (!q || q.hurst_exponent === undefined) return;
+
+          // 1. Hurst Exponent & Regime
+          document.getElementById('q-hurst-val').innerText = q.hurst_exponent.toFixed(3);
+          document.getElementById('q-hurst-badge').innerText = `H = ${q.hurst_exponent.toFixed(3)}`;
+          document.getElementById('q-regime-name').innerText = q.regime;
+          document.getElementById('q-regime-desc').innerText = q.regime_recommendation;
+          
+          const markerPct = Math.max(5, Math.min(95, q.hurst_exponent * 100));
+          const marker = document.getElementById('q-hurst-marker');
+          if (marker) marker.style.left = `${markerPct}%`;
+
+          // 2. Z-Score & Fair Value
+          const zSign = q.z_score >= 0 ? '+' : '';
+          document.getElementById('q-zscore-val').innerText = `${zSign}${q.z_score.toFixed(2)} σ`;
+          document.getElementById('q-zscore-badge').innerText = `${zSign}${q.z_score.toFixed(2)} σ`;
+          document.getElementById('q-mean-val').innerText = `$${q.mean_20.toFixed(2)}`;
+          document.getElementById('q-std-val').innerText = `±$${q.std_dev.toFixed(2)}`;
+
+          const zStat = document.getElementById('q-zscore-status');
+          const zDesc = document.getElementById('q-zscore-desc');
+          if (q.z_score < -1.5) {
+            zStat.innerText = "اشباع فروش آماری (کف)";
+            zStat.className = "text-[11px] font-extrabold text-emerald-400";
+            zDesc.innerText = "قیمت به کف آماری رسیده و پتانسیل جهش بالاست؛ خرید تایید می‌شود.";
+          } else if (q.z_score > 1.5) {
+            zStat.innerText = "اشباع خرید آماری (سقف)";
+            zStat.className = "text-[11px] font-extrabold text-red-400";
+            zDesc.innerText = "قیمت در سقف آماری است؛ احتمال اصلاح وجود دارد و شکست نیازمند حجم قوی است.";
+          } else {
+            zStat.innerText = "محدوده تعادل منصفانه (Fair)";
+            zStat.className = "text-[11px] font-extrabold text-emerald-300";
+            zDesc.innerText = "قیمت درون باند تعادلی ۱ سیگما قرار دارد؛ بدون اشباع خرید یا فروش حاد.";
+          }
+
+          // 3. Ornstein-Uhlenbeck Half-Life
+          document.getElementById('q-hl-hours').innerText = `${q.half_life_hours} h`;
+          document.getElementById('q-hl-bars').innerText = `${q.half_life_bars} Bars`;
+          document.getElementById('q-hl-bars-sub').innerText = `~${Math.round(q.half_life_bars)} کندل`;
+
+          // 4. Value-at-Risk & Kelly
+          document.getElementById('q-var95-val').innerText = `-$${q.var_95_usd.toFixed(2)}`;
+          document.getElementById('q-var99-val').innerText = `-$${q.var_99_usd.toFixed(2)}`;
+          document.getElementById('q-var-lot-lbl').innerText = `1-Day VaR (${lots} Lot)`;
+          document.getElementById('q-kelly-val').innerText = `${q.quarter_kelly_pct}% سرمایه`;
+
+          const riskUSD = parseFloat(document.getElementById('out-risk')?.innerText?.replace('-$','')) || 45;
+          const varEval = document.getElementById('q-var-evaluation');
+          if (riskUSD <= q.var_95_usd * 1.5) {
+            varEval.innerHTML = `<span class="text-emerald-400">✓ حد ضرر انتخابی ($${riskUSD.toFixed(0)}) متناسب با بازه نوسان آماری طلاست.</span>`;
+          } else {
+            varEval.innerHTML = `<span class="text-amber-400">⚠️ حد ضرر بزرگتر از VaR نرمال است؛ ریسک بالاتری متقبل شده‌اید.</span>`;
+          }
+        }
+      } catch (e) {
+        console.error("Quant fetch error:", e);
+      }
+    }
+
     async function refreshData() {
       try {
         const res = await fetch('/api/gold');
@@ -823,6 +1056,7 @@
       } catch (e) {}
       fetchMacro();
       fetchCalendar();
+      fetchQuantData();
       recalculateAll();
       simulateMonteCarlo();
     }
