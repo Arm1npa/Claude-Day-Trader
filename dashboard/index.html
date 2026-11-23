@@ -188,28 +188,36 @@
         </div>
         <div class="text-left shrink-0 mr-2 mono text-[11px]" id="shield-next-timer">
           <span class="text-gray-400 block text-[9px]">رویداد بعدی:</span>
-          <span class="font-bold text-amber-300" id="shield-next-time">ساعت 18:15 (Flash PMI)</span>
+          <span class="font-bold text-amber-300" id="shield-next-time">امروز (23 Nov) | ساعت 18:15</span>
         </div>
       </div>
 
       <!-- UPCOMING HIGH/MED ECONOMIC EVENTS LIST -->
       <div class="space-y-1 text-xs">
-        <span class="text-[10px] text-gray-400 block">رویدادهای مهم اقتصادی پیش‌رو (به وقت تهران):</span>
+        <span class="text-[10px] text-gray-400 block">تقویم رویدادهای مهم اقتصادی با تاریخ و زمان دقیق (به وقت تهران):</span>
         <div class="grid grid-cols-2 gap-2" id="events-grid">
-          <div class="p-2 rounded-lg bg-gray-950/70 border border-gray-800 flex justify-between items-center text-[11px]">
-            <div>
-              <span class="text-amber-400 font-bold block">Flash Services PMI</span>
-              <span class="text-[10px] text-gray-400">ساعت 18:15 تهران</span>
+          <div class="p-2.5 rounded-lg bg-gray-950/80 border border-gray-800 flex justify-between items-center text-[11px]">
+            <div class="truncate mr-1 space-y-0.5">
+              <span class="text-amber-400 font-bold block truncate">Flash Services PMI</span>
+              <div class="flex items-center gap-1.5 text-[10px] text-gray-400">
+                <span class="text-amber-300 font-semibold">📅 امروز (23 Nov)</span>
+                <span>•</span>
+                <span dir="ltr" class="mono text-gray-200 font-bold">⏰ 18:15</span>
+              </div>
             </div>
-            <span dir="ltr" class="mono text-[10px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-300">Medium</span>
+            <span dir="ltr" class="mono text-[9px] px-2 py-0.5 rounded font-bold bg-amber-950 text-amber-300 border border-amber-800">Medium</span>
           </div>
 
-          <div class="p-2 rounded-lg bg-gray-950/70 border border-gray-800 flex justify-between items-center text-[11px]">
-            <div>
-              <span class="text-gray-300 font-bold block">FOMC Member Williams</span>
-              <span class="text-[10px] text-gray-400">ساعت 00:30 بامداد</span>
+          <div class="p-2.5 rounded-lg bg-gray-950/80 border border-gray-800 flex justify-between items-center text-[11px]">
+            <div class="truncate mr-1 space-y-0.5">
+              <span class="text-gray-200 font-bold block truncate">FOMC Member Williams</span>
+              <div class="flex items-center gap-1.5 text-[10px] text-gray-400">
+                <span class="text-amber-300 font-semibold">📅 فردا (24 Nov)</span>
+                <span>•</span>
+                <span dir="ltr" class="mono text-gray-200 font-bold">⏰ 00:30</span>
+              </div>
             </div>
-            <span dir="ltr" class="mono text-[10px] px-1.5 py-0.5 rounded bg-gray-900 text-gray-400">Low</span>
+            <span dir="ltr" class="mono text-[9px] px-2 py-0.5 rounded font-bold bg-gray-900 text-gray-400 border border-gray-800">Low</span>
           </div>
         </div>
       </div>
@@ -1056,18 +1064,25 @@
           shieldDesc.innerText = c.shield_message;
 
           if (c.next_event) {
-            document.getElementById('shield-next-time').innerText = `${c.next_event.time_tehran} (${c.next_event.title})`;
+            const dLabel = c.next_event.date_label || 'امروز';
+            document.getElementById('shield-next-time').innerText = `${dLabel} | ساعت ${c.next_event.time_tehran} (${c.next_event.title})`;
           }
 
           if (c.events && c.events.length > 0) {
             const grid = document.getElementById('events-grid');
             grid.innerHTML = c.events.slice(0, 4).map(e => `
-              <div class="p-2 rounded-lg bg-gray-950/70 border border-gray-800 flex justify-between items-center text-[11px]">
-                <div class="truncate mr-1">
+              <div class="p-2.5 rounded-lg bg-gray-950/80 border border-gray-800/90 flex justify-between items-center text-[11px] hover:border-gray-700 transition">
+                <div class="truncate mr-1 space-y-0.5">
                   <span class="text-gray-200 font-bold block truncate">${e.title}</span>
-                  <span class="text-[10px] text-gray-400">ساعت ${e.time_tehran} تهران</span>
+                  <div class="flex items-center gap-1.5 text-[10px] text-gray-400">
+                    <span class="text-amber-300 font-semibold flex items-center gap-0.5">
+                      <span>📅</span><span>${e.date_label || 'امروز'}</span>
+                    </span>
+                    <span>•</span>
+                    <span dir="ltr" class="mono text-gray-200 font-bold">⏰ ${e.time_tehran}</span>
+                  </div>
                 </div>
-                <span dir="ltr" class="mono text-[9px] px-1.5 py-0.5 rounded shrink-0 ${e.impact === 'High' ? 'bg-red-950 text-red-300 border border-red-800' : 'bg-amber-950 text-amber-300 border border-amber-800'}">${e.impact}</span>
+                <span dir="ltr" class="mono text-[9px] px-2 py-0.5 rounded font-bold shrink-0 ${e.impact === 'High' ? 'bg-red-950 text-red-300 border border-red-800' : 'bg-amber-950 text-amber-300 border border-amber-800'}">${e.impact}</span>
               </div>
             `).join('');
           }

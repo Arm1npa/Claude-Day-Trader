@@ -125,6 +125,8 @@ def fetch_economic_calendar():
             
         usd_events = []
         now = datetime.datetime.now(datetime.timezone.utc)
+        now_tehran = now + datetime.timedelta(hours=3, minutes=30)
+        weekday_fa = ["دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه", "شنبه", "یکشنبه"]
         
         for ev in events:
             if ev.get("country") == "USD":
@@ -134,11 +136,23 @@ def fetch_economic_calendar():
                     ev_dt_utc = ev_dt.astimezone(datetime.timezone.utc)
                     diff_min = int((ev_dt_utc - now).total_seconds() / 60)
                     ev_dt_tehran = ev_dt_utc + datetime.timedelta(hours=3, minutes=30)
+
+                    diff_days = (ev_dt_tehran.date() - now_tehran.date()).days
+                    b_str = ev_dt_tehran.strftime("%d %b")
+                    if diff_days == 0:
+                        d_label = f"امروز ({b_str})"
+                    elif diff_days == 1:
+                        d_label = f"فردا ({b_str})"
+                    else:
+                        d_label = f"{weekday_fa[ev_dt_tehran.weekday()]} ({b_str})"
                     
                     usd_events.append({
                         "title": ev.get("title"),
                         "impact": ev.get("impact"),
                         "date": date_str,
+                        "date_label": d_label,
+                        "date_short": b_str,
+                        "day_name": weekday_fa[ev_dt_tehran.weekday()],
                         "time_tehran": ev_dt_tehran.strftime("%H:%M"),
                         "time_utc": ev_dt_utc.strftime("%H:%M UTC"),
                         "forecast": ev.get("forecast") or "--",
@@ -185,10 +199,10 @@ def fetch_economic_calendar():
             "shield_status": "SAFE",
             "shield_title": "سپر اخبار: وضعیت امن (SAFE)",
             "shield_message": "بدون رویداد پرریسک در ساعات آینده.",
-            "next_event": {"title": "Flash Manufacturing & Services PMI", "time_tehran": "18:15", "impact": "Medium", "minutes_away": 180},
+            "next_event": {"title": "Flash Manufacturing & Services PMI", "date_label": "امروز (23 Nov)", "time_tehran": "18:15", "impact": "Medium", "minutes_away": 180},
             "events": [
-                {"title": "Flash Services PMI", "impact": "Medium", "time_tehran": "18:15", "forecast": "55.0", "previous": "54.8"},
-                {"title": "FOMC Member Williams Speaks", "impact": "Low", "time_tehran": "00:30", "forecast": "--", "previous": "--"}
+                {"title": "Flash Services PMI", "impact": "Medium", "date_label": "امروز (23 Nov)", "time_tehran": "18:15", "forecast": "55.0", "previous": "54.8"},
+                {"title": "FOMC Member Williams Speaks", "impact": "Low", "date_label": "فردا (24 Nov)", "time_tehran": "00:30", "forecast": "--", "previous": "--"}
             ]
         }
 
