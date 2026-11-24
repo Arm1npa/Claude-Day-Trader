@@ -466,6 +466,200 @@ def evaluate_autopilot():
         "timestamp": datetime.datetime.now().strftime("%H:%M:%S")
     }
 
+def evaluate_frankfurt_orb(symbol="GC=F", target_r=0.5, selected_filter="all"):
+    """Evaluate 1:00 AM - 1:15 AM NY 15-Minute Opening Range Breakout (ORB) on 5m chart with 5 Regime Filters."""
+    url = f"https://query2.finance.yahoo.com/v8/finance/chart/{symbol}?range=3d&interval=5m"
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=8) as r:
+            data = json.loads(r.read().decode())
+        res = data["chart"]["result"][0]
+        timestamps = res["timestamp"]
+        quote = res["indicators"]["quote"][0]
+    except Exception as e:
+        return {"status": "ERROR", "message": f"خطا در دریافت دیتای ۵ دقیقه: {e}"}
+
+    bars = []
+    for i in range(len(timestamps)):
+        if quote["close"][i] is not None:
+            ts = timestamps[i]
+            dt_utc = datetime.datetime.fromtimestamp(ts, datetime.timezone.utc)
+            dt_ny = dt_utc - datetime.timedelta(hours=5)
+            dt_tehran = dt_utc + datetime.timedelta(hours=3, minutes=30)
+            bars.append({
+                "ts": ts,
+                "dt_ny": dt_ny,
+                "dt_tehran": dt_tehran,
+                "open": round(quote["open"][i], 2),
+                "high": round(quote["high"][i], 2),
+                "low": round(quote["low"][i], 2),
+                "close": round(quote["close"][i], 2),
+                "volume": quote["volume"][i] or 0
+            })
+
+    if not bars:
+        return {"status": "NO_DATA"}
+
+    today_ny = bars[-1]["dt_ny"].date()
+    orb_bars = [b for b in bars if b["dt_ny"].date() == today_ny and b["dt_ny"].hour == 1 and 0 <= b["dt_ny"].minute < 15]
+
+    if not orb_bars:
+        return {
+            "status": "WAITING_FOR_RANGE_SESSION",
+            "message": "در انتظار سشن ۱:۰۰ تا ۱:۱۵ صبح نیویورک (ساعت 09:30 تا 09:45 تهران)",
+            "range_high": None, "range_low": None
+        }
+
+    range_high = max(b["high"] for b in orb_bars)
+    range_low = min(b["low"] for b in orb_bars)
+    range_mid = round((range_high + range_low) / 2.0, 2)
+    range_size = round(range_high - range_low, 2)
+    current_price = bars[-1]["close"]
+
+    # 200 EMA calculation on 5m
+    closes = [b["close"] for b in bars]
+    if len(closes) >= 200:
+        k = 2 / (200 + 1)
+        ema = sum(closes[:200]) / 200
+        for c in closes[200:]:
+            ema = c * k + ema * (1 - k)
+        ema_200 = round(ema, 2)
+    else:
+        ema_200 = round(sum(closes) / len(closes), 2)
+
+    # ATR(14) on 5m
+    tr_list = []
+    for i in range(1, len(bars)):
+        tr = max(bars[i]["high"] - bars[i]["low"], abs(bars[i]["high"] - bars[i-1]["close"]), abs(bars[i]["low"] - bars[i-1]["close"]))
+        tr_list.append(tr)
+    atr14 = round(sum(tr_list[-14:]) / 14.0, 2) if len(tr_list) >= 14 else 5.0
+
+    vols = [b["volume"] for b in bars if b["volume"] > 0]
+    avg_vol_20 = sum(vols[-20:]) / 20.0 if len(vols) >= 20 else 100
+
+    # Scan subsequent bars after 1:15am NY for breakout
+    post_bars = [b for b in bars if b["dt_ny"].date() == today_ny and ((b["dt_ny"].hour == 1 and b["dt_ny"].minute >= 15) or b["dt_ny"].hour > 1)]
+
+    breakout_signal = None
+    for b in post_bars:
+        if b["close"] > range_high:
+            sl = range_low
+            risk = round(b["close"] - sl, 2)
+            tp_target = round(b["close"] + target_r * risk, 2)
+            breakout_signal = {
+                "direction": "LONG",
+                "trigger_time_ny": b["dt_ny"].strftime("%H:%M"),
+                "trigger_time_tehran": b["dt_tehran"].strftime("%H:%M"),
+                "entry": b["close"],
+                "stop_loss": sl,
+                "target": tp_target,
+                "risk_points": risk,
+                "target_r": target_r,
+                "trigger_bar_volume": b["volume"]
+            }
+            break
+        elif b["close"] < range_low:
+            sl = range_high
+            risk = round(sl - b["close"], 2)
+            tp_target = round(b["close"] - target_r * risk, 2)
+            breakout_signal = {
+                "direction": "SHORT",
+                "trigger_time_ny": b["dt_ny"].strftime("%H:%M"),
+                "trigger_time_tehran": b["dt_tehran"].strftime("%H:%M"),
+                "entry": b["close"],
+                "stop_loss": sl,
+                "target": tp_target,
+                "risk_points": risk,
+                "target_r": target_r,
+                "trigger_bar_volume": b["volume"]
+            }
+            break
+
+    direction_check = breakout_signal["direction"] if breakout_signal else ("LONG" if current_price >= range_mid else "SHORT")
+
+    # 1. Hurst Exponent Filter
+    log_ret = [math.log(closes[i]/closes[i-1]) for i in range(1, len(closes)) if closes[i-1] > 0][-60:]
+    m = len(log_ret)
+    if m > 1:
+        mean_ret = sum(log_ret)/m
+        cum_dev = []
+        tot = 0
+        for r in log_ret:
+            tot += (r - mean_ret)
+            cum_dev.append(tot)
+        R = max(cum_dev) - min(cum_dev)
+        S = math.sqrt(sum((r - mean_ret)**2 for r in log_ret)/(m-1)) if m > 1 else 1.0
+        RS = R/S if S > 0 else 1.0
+        hurst = round(math.log(RS)/math.log(m), 3) if m > 1 else 0.5
+    else:
+        hurst = 0.5
+    f1_pass = hurst > 0.50
+    f1_status = "PASS" if f1_pass else "BLOCK"
+    f1_desc = f"H={hurst} (رژیم {'مومنتوم روندی' if f1_pass else 'بازگشت به میانگین'})"
+
+    # 2. 200 EMA Filter
+    f2_pass = (current_price >= ema_200) if direction_check == "LONG" else (current_price <= ema_200)
+    f2_status = "PASS" if f2_pass else "BLOCK"
+    f2_desc = f"قیمت {current_price} {'بالای' if current_price >= ema_200 else 'زیر'} EMA200 ({ema_200})"
+
+    # 3. Volume & ATR Expansion Filter
+    range_adequate = range_size >= (0.35 * atr14)
+    vol_pass = (bars[-1]["volume"] >= 1.0 * avg_vol_20) if avg_vol_20 > 0 else True
+    f3_pass = range_adequate and vol_pass
+    f3_status = "PASS" if f3_pass else "BLOCK"
+    f3_desc = f"اندازه رنج ${range_size} (حداقل ${round(0.35*atr14,2)}) | ATR={atr14}"
+
+    # 4. Macro DXY Confluence
+    macro = fetch_macro_correlation()
+    dxy_change = macro.get("dxy", {}).get("change", 0.0)
+    f4_pass = (dxy_change <= 0.10) if direction_check == "LONG" else (dxy_change >= -0.10)
+    f4_status = "PASS" if f4_pass else "BLOCK"
+    f4_desc = f"تغییر شاخص دلار: {dxy_change}%"
+
+    # 5. News Shield Filter
+    cal = fetch_economic_calendar()
+    shield_status = cal.get("shield_status", "SAFE")
+    f5_pass = shield_status != "DANGER"
+    f5_status = "PASS" if f5_pass else "BLOCK"
+    f5_desc = f"وضعیت تقویم اخبار: {shield_status}"
+
+    filters_dict = {
+        "f1_hurst": {"name": "۱. رژیم هورست (Hurst > 0.50)", "pass": f1_pass, "status": f1_status, "detail": f1_desc},
+        "f2_ema200": {"name": "۲. روند میانگین ۲۰۰ (200 EMA)", "pass": f2_pass, "status": f2_status, "detail": f2_desc},
+        "f3_vol_atr": {"name": "۳. انبساط نوسان و حجم (Volume & ATR)", "pass": f3_pass, "status": f3_status, "detail": f3_desc},
+        "f4_dxy": {"name": "۴. همگرایی شاخص دلار (DXY Trend)", "pass": f4_pass, "status": f4_status, "detail": f4_desc},
+        "f5_news": {"name": "۵. سپر محافظ اخبار فارکس فکتوری", "pass": f5_pass, "status": f5_status, "detail": f5_desc}
+    }
+
+    if selected_filter == "none":
+        filter_verdict = "PASS"
+    elif selected_filter in filters_dict:
+        filter_verdict = filters_dict[selected_filter]["status"]
+    else:
+        filter_verdict = "PASS" if all(f["pass"] for f in filters_dict.values()) else "FILTERED"
+
+    status_code = "TRIGGERED" if breakout_signal else "WAITING"
+
+    return {
+        "symbol": symbol,
+        "date_ny": str(today_ny),
+        "range_window": "01:00 - 01:15 NY (09:30 - 09:45 Tehran)",
+        "status": status_code,
+        "range_high": range_high,
+        "range_low": range_low,
+        "range_mid": range_mid,
+        "range_size": range_size,
+        "current_price": current_price,
+        "dist_to_high": round(max(0, range_high - current_price), 2),
+        "dist_to_low": round(max(0, current_price - range_low), 2),
+        "breakout_signal": breakout_signal,
+        "filters": filters_dict,
+        "selected_filter": selected_filter,
+        "filter_verdict": filter_verdict,
+        "target_r": target_r,
+        "timestamp": datetime.datetime.now().strftime("%H:%M:%S")
+    }
+
 class ProfessionalTradingHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=os.path.dirname(os.path.abspath(__file__)), **kwargs)
@@ -520,6 +714,42 @@ class ProfessionalTradingHandler(http.server.SimpleHTTPRequestHandler):
             self.send_header("Access-Control-Allow-Origin", "*")
             self.end_headers()
             self.wfile.write(json.dumps(data).encode("utf-8"))
+        elif self.path.startswith("/api/orb"):
+            sym = "GC=F"
+            tr = 0.5
+            flt = "all"
+            if "?" in self.path:
+                try:
+                    qs = urllib.parse.parse_qs(self.path.split("?", 1)[1])
+                    if "symbol" in qs:
+                        sym = qs["symbol"][0]
+                    if "target_r" in qs:
+                        tr = float(qs["target_r"][0])
+                    if "filter" in qs:
+                        flt = qs["filter"][0]
+                except Exception:
+                    pass
+            data = evaluate_frankfurt_orb(symbol=sym, target_r=tr, selected_filter=flt)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(json.dumps(data).encode("utf-8"))
+        elif self.path.startswith("/strategies/"):
+            file_name = self.path.split("/")[-1]
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            file_path = os.path.join(base_dir, "strategies", file_name)
+            if os.path.exists(file_path):
+                with open(file_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/plain; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(content.encode("utf-8"))
+            else:
+                self.send_response(404)
+                self.end_headers()
         else:
             return super().do_GET()
 

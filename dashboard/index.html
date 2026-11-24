@@ -488,6 +488,214 @@
     </div>
   </div>
 
+  <!-- SECTION 5: FRANKFURT / NY 1:00-1:15 AM ORB STRATEGY ENGINE (WITH 5 REGIME FILTERS) -->
+  <div class="bg-[#0d121f] border border-amber-500/40 rounded-2xl p-4.5 glow-card space-y-4">
+    
+    <!-- HEADER & SYMBOL / TARGET SELECTOR -->
+    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 pb-3 border-b border-gray-800">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-600 text-slate-950 flex items-center justify-center text-lg font-black shadow-lg shadow-amber-500/30 shrink-0">
+          🎯
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h2 class="font-black text-white text-sm sm:text-base">استراتژی شکست رنج سشن نیویورک (1:00-1:15 AM NY ORB Strategy)</h2>
+            <span dir="ltr" class="mono text-[10px] px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-700 font-bold">5-MIN BARS | TARGET 0.5R</span>
+          </div>
+          <p class="text-[11px] text-gray-400 mt-0.5">
+            محاسبه خودکار رنج ۱۵ دقیقه‌ای (ساعت 09:30 تا 09:45 تهران)، ورود در شکست بدنه کندل ۵ دقیقه، حد ضرر در سمت مقابل رنج، و ارزیابی ۵ فیلتر رژیم
+          </p>
+        </div>
+      </div>
+
+      <!-- SYMBOL & R:R SELECTOR -->
+      <div class="flex items-center gap-2 flex-wrap w-full lg:w-auto justify-end">
+        <!-- SYMBOL SELECTOR -->
+        <div class="flex bg-gray-950 p-1 rounded-xl mono text-xs border border-gray-800">
+          <button id="orb-sym-gc" onclick="setOrbSymbol('GC=F')" class="px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 font-black shadow transition">🥇 انس طلا (XAUUSD)</button>
+          <button id="orb-sym-mnq" onclick="setOrbSymbol('MNQ=F')" class="px-2.5 py-1 rounded-lg text-gray-400 hover:text-white transition">💻 نزدک (MNQ)</button>
+        </div>
+
+        <!-- TARGET R SELECTOR -->
+        <div class="flex items-center gap-1 bg-gray-950 px-2 py-1 rounded-xl border border-gray-800 mono text-xs">
+          <span class="text-gray-400 text-[10px]">تارگت:</span>
+          <button onclick="setOrbTargetR(0.5)" id="orb-r-05" class="px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-bold">0.5R</button>
+          <button onclick="setOrbTargetR(1.0)" id="orb-r-10" class="px-2 py-0.5 rounded bg-gray-900 text-gray-400">1.0R</button>
+          <button onclick="setOrbTargetR(1.5)" id="orb-r-15" class="px-2 py-0.5 rounded bg-gray-900 text-gray-400">1.5R</button>
+        </div>
+
+        <button onclick="fetchOrbStrategy()" class="p-1.5 rounded-xl bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-300 transition" title="به‌روزرسانی رنج و سیگنال">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- LIVE RANGE TILES & BREAKOUT STATUS -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      
+      <!-- 4 RANGE TILES (7 cols) -->
+      <div class="lg:col-span-7 space-y-3">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs">
+          <!-- RANGE HIGH -->
+          <div class="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-800/50">
+            <span class="text-emerald-400 font-bold block text-[10px] mb-0.5">سقف رنج (ماشه خرید):</span>
+            <span dir="ltr" class="mono text-base font-black text-white block" id="orb-high">$3,632.60</span>
+            <span class="text-[9px] text-gray-400">Long > سقف</span>
+          </div>
+
+          <!-- RANGE MID -->
+          <div class="p-2.5 rounded-xl bg-gray-950/80 border border-gray-800">
+            <span class="text-gray-400 font-bold block text-[10px] mb-0.5">نقطه تعادل رنج:</span>
+            <span dir="ltr" class="mono text-base font-black text-amber-300 block" id="orb-mid">$3,624.90</span>
+            <span class="text-[9px] text-gray-400">خط وسط 50%</span>
+          </div>
+
+          <!-- RANGE LOW -->
+          <div class="p-2.5 rounded-xl bg-red-950/30 border border-red-800/50">
+            <span class="text-red-400 font-bold block text-[10px] mb-0.5">کف رنج (ماشه فروش):</span>
+            <span dir="ltr" class="mono text-base font-black text-white block" id="orb-low">$3,617.20</span>
+            <span class="text-[9px] text-gray-400">Short < کف</span>
+          </div>
+
+          <!-- RANGE SIZE -->
+          <div class="p-2.5 rounded-xl bg-indigo-950/30 border border-indigo-800/50">
+            <span class="text-indigo-300 font-bold block text-[10px] mb-0.5">دامنه رنج (Size):</span>
+            <span dir="ltr" class="mono text-base font-black text-indigo-200 block" id="orb-size">$15.40</span>
+            <span class="text-[9px] text-gray-400">فاصله استاپ</span>
+          </div>
+        </div>
+
+        <!-- VISUAL PRICE GAUGE INSIDE RANGE -->
+        <div class="p-3 rounded-xl bg-gray-950/80 border border-gray-800/80 space-y-1.5 text-xs">
+          <div class="flex justify-between items-center text-[11px]">
+            <span class="text-gray-400">موقعیت لحظه‌ای قیمت نسبت به رنج:</span>
+            <div class="flex items-center gap-2 mono font-bold">
+              <span class="text-emerald-400" id="orb-dist-high">فاصله تا سقف: +$10.8</span>
+              <span class="text-gray-600">|</span>
+              <span class="text-red-400" id="orb-dist-low">فاصله تا کف: -$4.6</span>
+            </div>
+          </div>
+          <div class="w-full bg-gray-900 h-2.5 rounded-full overflow-hidden flex border border-gray-800 relative">
+            <div class="w-1/2 bg-red-950/40 border-r border-gray-700" title="Short Zone"></div>
+            <div class="w-1/2 bg-emerald-950/40" title="Long Zone"></div>
+            <div id="orb-price-pin" class="absolute top-0 bottom-0 w-2 bg-amber-400 shadow-md shadow-amber-400/60 rounded-full transition-all duration-500" style="left: 30%;"></div>
+          </div>
+          <div class="flex justify-between text-[9px] text-gray-500 mono">
+            <span>کف رنج ($3,617.2)</span>
+            <span>نقطه وسط ($3,624.9)</span>
+            <span>سقف رنج ($3,632.6)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIGNAL VERDICT & 1-CLICK APPLY (5 cols) -->
+      <div class="lg:col-span-5 p-3.5 rounded-xl bg-gradient-to-br from-gray-950 to-[#0e1726] border border-gray-800 space-y-3 flex flex-col justify-between">
+        <div>
+          <div class="flex justify-between items-center pb-2 border-b border-gray-800/80 text-xs">
+            <span class="font-bold text-gray-300">وضعیت شکست و سیگنال زنده:</span>
+            <span dir="ltr" class="mono text-[10px] px-2 py-0.5 rounded font-black bg-amber-950 text-amber-300 border border-amber-700" id="orb-signal-badge">COILING (WAITING)</span>
+          </div>
+          
+          <div class="mt-2.5" id="orb-signal-content">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">⏳</span>
+              <div>
+                <span class="font-black text-white text-xs block">قیمت در حال نوسان و فشردگی درون رنج است</span>
+                <span class="text-[11px] text-gray-400 block mt-0.5" id="orb-status-desc">
+                  در انتظار بسته‌شدن بدنه کندل ۵ دقیقه خارج از رنج؛ هنوز هیچ کندلی بیرون رنج بسته نشده است.
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button onclick="applyOrbToChart()" id="btn-apply-orb" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black py-2 rounded-xl text-xs transition shadow-md shadow-amber-500/20 active:scale-95 flex items-center justify-center gap-1">
+            <span>⚡ بارگذاری در نردبان</span>
+          </button>
+
+          <button onclick="copyPineScriptCode()" class="w-full bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-200 font-bold py-2 rounded-xl text-xs transition active:scale-95 flex items-center justify-center gap-1">
+            <span>📋 کپی Pine Script 6</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 5 REGIME FILTERS SCORECARD & SELECTOR -->
+    <div class="pt-3 border-t border-gray-800/80 space-y-2.5">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+        <div class="flex items-center gap-2">
+          <span class="font-extrabold text-white text-xs">فیلترهای رژیم معاملاتی (Regime Filters):</span>
+          <span class="text-gray-400 text-[11px]">انتخاب کنید کدام فیلتر ارزیابی شود:</span>
+        </div>
+
+        <!-- FILTER SELECTOR PILLS -->
+        <div class="flex items-center gap-1.5 flex-wrap mono text-[11px]">
+          <button onclick="setOrbFilter('all')" id="flt-all" class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold transition">همه فیلترها (All)</button>
+          <button onclick="setOrbFilter('f1_hurst')" id="flt-f1" class="px-2 py-1 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-800 transition">۱. هورست</button>
+          <button onclick="setOrbFilter('f2_ema200')" id="flt-f2" class="px-2 py-1 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-800 transition">۲. EMA 200</button>
+          <button onclick="setOrbFilter('f3_vol_atr')" id="flt-f3" class="px-2 py-1 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-800 transition">۳. حجم و ATR</button>
+          <button onclick="setOrbFilter('f4_dxy')" id="flt-f4" class="px-2 py-1 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-800 transition">۴. ماکرو DXY</button>
+          <button onclick="setOrbFilter('f5_news')" id="flt-f5" class="px-2 py-1 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-800 transition">۵. اخبار</button>
+          <button onclick="setOrbFilter('none')" id="flt-none" class="px-2 py-1 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-400 border border-gray-800 transition">بدون فیلتر</button>
+        </div>
+      </div>
+
+      <!-- 5 FILTER CARDS GRID -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 text-xs">
+        
+        <!-- F1: HURST -->
+        <div class="p-2.5 rounded-xl bg-gray-950/80 border border-gray-800/80 space-y-1">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-300 font-bold text-[10px]">۱. هورست (Hurst > 0.5):</span>
+            <span dir="ltr" class="mono text-[9px] px-1.5 py-0.5 rounded font-black bg-red-950 text-red-300 border border-red-800" id="f1-badge">BLOCK</span>
+          </div>
+          <span class="text-[10px] text-gray-400 block truncate" id="f1-desc">H=0.47 (بازگشت به میانگین)</span>
+        </div>
+
+        <!-- F2: 200 EMA -->
+        <div class="p-2.5 rounded-xl bg-gray-950/80 border border-gray-800/80 space-y-1">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-300 font-bold text-[10px]">۲. روند 200 EMA:</span>
+            <span dir="ltr" class="mono text-[9px] px-1.5 py-0.5 rounded font-black bg-emerald-950 text-emerald-300 border border-emerald-800" id="f2-badge">PASS</span>
+          </div>
+          <span class="text-[10px] text-gray-400 block truncate" id="f2-desc">زیر EMA200 (3,634$)</span>
+        </div>
+
+        <!-- F3: VOLUME & ATR -->
+        <div class="p-2.5 rounded-xl bg-gray-950/80 border border-gray-800/80 space-y-1">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-300 font-bold text-[10px]">۳. حجم و ATR:</span>
+            <span dir="ltr" class="mono text-[9px] px-1.5 py-0.5 rounded font-black bg-emerald-950 text-emerald-300 border border-emerald-800" id="f3-badge">PASS</span>
+          </div>
+          <span class="text-[10px] text-gray-400 block truncate" id="f3-desc">رنج $15.4 (حداقل $2.2)</span>
+        </div>
+
+        <!-- F4: MACRO DXY -->
+        <div class="p-2.5 rounded-xl bg-gray-950/80 border border-gray-800/80 space-y-1">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-300 font-bold text-[10px]">۴. شاخص دلار DXY:</span>
+            <span dir="ltr" class="mono text-[9px] px-1.5 py-0.5 rounded font-black bg-emerald-950 text-emerald-300 border border-emerald-800" id="f4-badge">PASS</span>
+          </div>
+          <span class="text-[10px] text-gray-400 block truncate" id="f4-desc">تغییر DXY: -0.01%</span>
+        </div>
+
+        <!-- F5: NEWS SHIELD -->
+        <div class="p-2.5 rounded-xl bg-gray-950/80 border border-gray-800/80 space-y-1">
+          <div class="flex justify-between items-center">
+            <span class="text-gray-300 font-bold text-[10px]">۵. سپر اخبار:</span>
+            <span dir="ltr" class="mono text-[9px] px-1.5 py-0.5 rounded font-black bg-emerald-950 text-emerald-300 border border-emerald-800" id="f5-badge">PASS</span>
+          </div>
+          <span class="text-[10px] text-gray-400 block truncate" id="f5-desc">وضعیت امن (SAFE)</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
   <!-- MAIN 2-COLUMN WORKSPACE -->
   <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
     
@@ -1198,6 +1406,181 @@
       }
     }
 
+    // 1:00-1:15 AM NY ORB STRATEGY ENGINE
+    let orbSymbol = 'GC=F';
+    let orbTargetR = 0.5;
+    let orbFilter = 'all';
+    let currentOrbData = null;
+
+    function setOrbSymbol(sym) {
+      orbSymbol = sym;
+      document.getElementById('orb-sym-gc').className = sym === 'GC=F' ? "px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 font-black shadow transition" : "px-2.5 py-1 rounded-lg text-gray-400 hover:text-white transition";
+      document.getElementById('orb-sym-mnq').className = sym === 'MNQ=F' ? "px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 font-black shadow transition" : "px-2.5 py-1 rounded-lg text-gray-400 hover:text-white transition";
+      fetchOrbStrategy();
+    }
+
+    function setOrbTargetR(r) {
+      orbTargetR = r;
+      ['05', '10', '15'].forEach(k => {
+        const btn = document.getElementById(`orb-r-${k}`);
+        if (btn) btn.className = "px-2 py-0.5 rounded bg-gray-900 text-gray-400";
+      });
+      const actKey = r === 0.5 ? '05' : (r === 1.0 ? '10' : '15');
+      const actBtn = document.getElementById(`orb-r-${actKey}`);
+      if (actBtn) actBtn.className = "px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-bold";
+      fetchOrbStrategy();
+    }
+
+    function setOrbFilter(flt) {
+      orbFilter = flt;
+      ['all', 'f1', 'f2', 'f3', 'f4', 'f5', 'none'].forEach(k => {
+        const btn = document.getElementById(`flt-${k}`);
+        if (btn) btn.className = "px-2 py-1 rounded-lg bg-gray-900 hover:bg-gray-800 text-gray-400 border border-gray-800 transition text-[11px]";
+      });
+      const shortKey = flt.replace('_hurst','').replace('_ema200','').replace('_vol_atr','').replace('_dxy','').replace('_news','');
+      const act = document.getElementById(`flt-${shortKey}`);
+      if (act) act.className = "px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-bold transition text-[11px]";
+      fetchOrbStrategy();
+    }
+
+    async function fetchOrbStrategy() {
+      try {
+        const res = await fetch(`/api/orb?symbol=${orbSymbol}&target_r=${orbTargetR}&filter=${orbFilter}`);
+        if (res.ok) {
+          const d = await res.json();
+          currentOrbData = d;
+          if (d.status === 'ERROR' || !d.range_high) return;
+
+          document.getElementById('orb-high').innerText = `$${d.range_high.toFixed(2)}`;
+          document.getElementById('orb-low').innerText = `$${d.range_low.toFixed(2)}`;
+          document.getElementById('orb-mid').innerText = `$${d.range_mid.toFixed(2)}`;
+          document.getElementById('orb-size').innerText = `$${d.range_size.toFixed(2)}`;
+
+          document.getElementById('orb-dist-high').innerText = `فاصله تا سقف: +$${d.dist_to_high.toFixed(2)}`;
+          document.getElementById('orb-dist-low').innerText = `فاصله تا کف: -$${d.dist_to_low.toFixed(2)}`;
+
+          if (d.range_size > 0) {
+            const pct = Math.max(0, Math.min(100, ((d.current_price - d.range_low) / d.range_size) * 100));
+            const pin = document.getElementById('orb-price-pin');
+            if (pin) pin.style.left = `${pct}%`;
+          }
+
+          const sigBadge = document.getElementById('orb-signal-badge');
+          const sigContent = document.getElementById('orb-signal-content');
+          if (d.breakout_signal) {
+            const s = d.breakout_signal;
+            const isLong = s.direction === 'LONG';
+            sigBadge.className = `mono text-[10px] px-2 py-0.5 rounded font-black ${isLong ? 'bg-emerald-950 text-emerald-300 border border-emerald-600 animate-pulse' : 'bg-red-950 text-red-300 border border-red-600 animate-pulse'}`;
+            sigBadge.innerText = `${s.direction} BREAKOUT TRIGGERED!`;
+
+            sigContent.innerHTML = `
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">${isLong ? '🚀' : '🔻'}</span>
+                  <span class="font-black text-white text-xs sm:text-sm">سیگنال شکست صادر شد: ${isLong ? 'خرید (LONG BREAKOUT)' : 'فروش (SHORT BREAKOUT)'}</span>
+                </div>
+                <div class="grid grid-cols-3 gap-1.5 mono text-[11px] pt-1">
+                  <div class="p-1 rounded bg-gray-900 border border-gray-800 text-center"><span class="text-gray-400 block text-[9px]">ورود:</span><span class="text-white font-bold">$${s.entry.toFixed(2)}</span></div>
+                  <div class="p-1 rounded bg-red-950/40 border border-red-900 text-center"><span class="text-red-400 block text-[9px]">حد ضرر (مقابل رنج):</span><span class="text-red-300 font-bold">$${s.stop_loss.toFixed(2)}</span></div>
+                  <div class="p-1 rounded bg-emerald-950/40 border border-emerald-900 text-center"><span class="text-emerald-400 block text-[9px]">تارگت (${s.target_r}R):</span><span class="text-emerald-300 font-bold">$${s.target.toFixed(2)}</span></div>
+                </div>
+              </div>
+            `;
+          } else {
+            sigBadge.className = "mono text-[10px] px-2 py-0.5 rounded font-black bg-amber-950 text-amber-300 border border-amber-700";
+            sigBadge.innerText = "COILING (WAITING)";
+            sigContent.innerHTML = `
+              <div class="flex items-center gap-2">
+                <span class="text-lg">⏳</span>
+                <div>
+                  <span class="font-black text-white text-xs block">قیمت در حال نوسان و فشردگی درون رنج است</span>
+                  <span class="text-[11px] text-gray-400 block mt-0.5">
+                    در انتظار بسته‌شدن بدنه کندل ۵ دقیقه بیرون رنج ($${d.range_low.toFixed(1)} تا $${d.range_high.toFixed(1)})
+                  </span>
+                </div>
+              </div>
+            `;
+          }
+
+          if (d.filters) {
+            ['f1_hurst', 'f2_ema200', 'f3_vol_atr', 'f4_dxy', 'f5_news'].forEach((k, idx) => {
+              const num = idx + 1;
+              const f = d.filters[k];
+              const badge = document.getElementById(`f${num}-badge`);
+              const desc = document.getElementById(`f${num}-desc`);
+              if (badge && f) {
+                badge.innerText = f.status;
+                badge.className = `mono text-[9px] px-1.5 py-0.5 rounded font-black ${f.pass ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-red-950 text-red-300 border border-red-800'}`;
+              }
+              if (desc && f) desc.innerText = f.detail;
+            });
+          }
+        }
+      } catch (e) {
+        console.error("ORB fetch error:", e);
+      }
+    }
+
+    function applyOrbToChart() {
+      if (!currentOrbData) return;
+      const d = currentOrbData;
+      if (d.breakout_signal) {
+        const s = d.breakout_signal;
+        currentDirection = s.direction.toLowerCase();
+        setup = {
+          entry: s.entry,
+          stop: s.stop_loss,
+          target: s.target,
+          direction: currentDirection
+        };
+        currentOrderType = currentDirection === 'long' ? 'BUY_STOP' : 'SELL_STOP';
+      } else {
+        const distH = d.dist_to_high;
+        const distL = d.dist_to_low;
+        if (distH < distL) {
+          currentDirection = 'long';
+          const risk = d.range_size;
+          setup = {
+            entry: d.range_high,
+            stop: d.range_low,
+            target: d.range_high + (orbTargetR * risk),
+            direction: 'long'
+          };
+          currentOrderType = 'BUY_STOP';
+        } else {
+          currentDirection = 'short';
+          const risk = d.range_size;
+          setup = {
+            entry: d.range_low,
+            stop: d.range_high,
+            target: d.range_low - (orbTargetR * risk),
+            direction: 'short'
+          };
+          currentOrderType = 'SELL_STOP';
+        }
+      }
+      updateInputs();
+      updateDirectionUI();
+      recalculateAll();
+      simulateMonteCarlo();
+      
+      const btn = document.getElementById('btn-apply-orb');
+      btn.innerHTML = "<span>✓ در نردبان بارگذاری شد!</span>";
+      setTimeout(() => btn.innerHTML = "<span>⚡ بارگذاری در نردبان</span>", 2500);
+    }
+
+    function copyPineScriptCode() {
+      fetch('/strategies/orb_1am_ny_strategy.pine')
+        .then(r => r.text())
+        .then(code => {
+          navigator.clipboard.writeText(code);
+          alert("کد کامل Pine Script 6 تریدینگ‌ویو در کلیپ‌بورد کپی شد! می‌توانید آن را در تب Pine Editor تریدینگ‌ویو Paste کنید.");
+        })
+        .catch(() => {
+          alert("کد Pine Script در مسیر strategies/orb_1am_ny_strategy.pine در پروژه ذخیره شده است.");
+        });
+    }
+
     async function refreshData() {
       try {
         const res = await fetch('/api/gold');
@@ -1214,6 +1597,7 @@
       fetchCalendar();
       fetchQuantData();
       fetchAutoPilot();
+      fetchOrbStrategy();
       recalculateAll();
       simulateMonteCarlo();
     }

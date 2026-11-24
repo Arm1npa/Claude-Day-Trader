@@ -1,0 +1,188 @@
+//@version=6
+strategy("15-Min ORB Strategy (1:00-1:15 AM NY) [5 Regime Filters]", overlay=true, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=10, calc_on_every_tick=false)
+
+// ==========================================
+// 1. INPUTS & CONFIGURATION
+// ==========================================
+grp_session = "Opening Range Session (New York Time)"
+sessionTime = input.session("0100-0115", "ORB Window (HHMM-HHMM)", group=grp_session, tooltip="1:00 AM to 1:15 AM New York time (Frankfurt European Pre-Open)")
+sessionTz   = input.string("America/New_York", "Timezone", group=grp_session)
+
+grp_trade = "Trade Management & Targets"
+targetR = input.float(0.5, "Target R Multiplier (0.5R Default)", minval=0.1, maxval=5.0, step=0.1, group=grp_trade)
+maxTradesPerDay = input.int(1, "Max Trades Per Day", minval=1, maxval=5, group=grp_trade)
+
+grp_regime = "Regime Filters Selection"
+regimeMode = input.string("Filter 1: Hurst Exponent (H > 0.50)", "Active Regime Filter to Test", 
+     options=["None (Raw Breakout)", 
+              "Filter 1: Hurst Exponent (H > 0.50)", 
+              "Filter 2: 200 EMA Trend Alignment", 
+              "Filter 3: Volume Expansion (> 1.3x SMA20)", 
+              "Filter 4: Range Size >= 0.4x ATR(14)", 
+              "Filter 5: RSI Momentum (Bullish > 50 / Bearish < 50)",
+              "All Filters Confluence"], 
+     group=grp_regime, 
+     tooltip="Choose which regime filter to evaluate against raw breakout performance")
+
+// ==========================================
+// 2. ORB 15-MINUTE RANGE DETECTION
+// ==========================================
+inSession = not na(time(timeframe.period, sessionTime + ":1234567", sessionTz))
+newSession = inSession and not inSession[1]
+endSession = not inSession and inSession[1]
+
+var float rangeHigh = na
+var float rangeLow = na
+var float rangeMid = na
+var int tradesToday = 0
+
+// Reset on new calendar day
+newDay = ta.change(time("D"))
+if newDay
+    tradesToday := 0
+
+if newSession
+    rangeHigh := high
+    rangeLow := low
+    rangeMid := (high + low) / 2.0
+else if inSession
+    rangeHigh := math.max(rangeHigh, high)
+    rangeLow := math.min(rangeLow, low)
+    rangeMid := (rangeHigh + rangeLow) / 2.0
+
+// Draw ORB Box on chart
+var box orbBox = na
+if newSession
+    orbBox := box.new(left=bar_index, top=rangeHigh, right=bar_index, bottom=rangeLow, 
+                      border_color=color.new(color.amber, 20), border_width=2, 
+                      bgcolor=color.new(color.amber, 90))
+else if inSession and not na(orbBox)
+    box.set_top(orbBox, rangeHigh)
+    box.set_bottom(orbBox, rangeLow)
+    box.set_right(orbBox, bar_index)
+else if endSession and not na(orbBox)
+    box.set_right(orbBox, bar_index)
+
+plot(not inSession and not na(rangeHigh) ? rangeHigh : na, "ORB Range High", color=color.new(color.green, 20), style=plot.style_linebr, linewidth=2)
+plot(not inSession and not na(rangeLow) ? rangeLow : na, "ORB Range Low", color=color.new(color.red, 20), style=plot.style_linebr, linewidth=2)
+plot(not inSession and not na(rangeMid) ? rangeMid : na, "ORB Range Midpoint", color=color.new(color.gray, 50), style=plot.style_linebr, linewidth=1)
+
+// ==========================================
+// 3. THE 5 REGIME FILTERS
+// ==========================================
+
+// FILTER 1: HURST EXPONENT ESTIMATOR (R/S Analysis over 60 bars)
+calcHurst(int len) =>
+    float logRet = math.log(close / close[1])
+    float meanRet = ta.sma(logRet, len)
+    float devSum = 0.0
+    float maxDev = 0.0
+    float minDev = 0.0
+    for i = 0 to len - 1
+        devSum := devSum + (logRet[i] - meanRet)
+        maxDev := math.max(maxDev, devSum)
+        minDev := math.min(minDev, devSum)
+    float R = maxDev - minDev
+    float S = ta.stdev(logRet, len)
+    float hurstVal = (S > 0 and R > 0) ? math.log(R / S) / math.log(len) : 0.5
+    hurstVal
+
+hurstExponent = calcHurst(60)
+filter1_pass_long  = hurstExponent > 0.50
+filter1_pass_short = hurstExponent > 0.50
+
+// FILTER 2: 200 EMA TREND ALIGNMENT
+ema200 = ta.ema(close, 200)
+filter2_pass_long  = close > ema200
+filter2_pass_short = close < ema200
+
+// FILTER 3: VOLUME EXPANSION
+volSma20 = ta.sma(volume, 20)
+filter3_pass_long  = volume > 1.3 * volSma20
+filter3_pass_short = volume > 1.3 * volSma20
+
+// FILTER 4: RANGE SIZE vs ATR(14) (Eliminates tiny noise ranges)
+atr14 = ta.atr(14)
+rangeSize = rangeHigh - rangeLow
+filter4_pass_long  = rangeSize >= (0.4 * atr14)
+filter4_pass_short = rangeSize >= (0.4 * atr14)
+
+// FILTER 5: RSI MOMENTUM FILTER (50 Cross)
+rsi14 = ta.rsi(close, 14)
+filter5_pass_long  = rsi14 > 50
+filter5_pass_short = rsi14 < 50
+
+// Evaluate Selected Filter
+passFilterLong = switch regimeMode
+    "None (Raw Breakout)" => true
+    "Filter 1: Hurst Exponent (H > 0.50)" => filter1_pass_long
+    "Filter 2: 200 EMA Trend Alignment" => filter2_pass_long
+    "Filter 3: Volume Expansion (> 1.3x SMA20)" => filter3_pass_long
+    "Filter 4: Range Size >= 0.4x ATR(14)" => filter4_pass_long
+    "Filter 5: RSI Momentum (Bullish > 50 / Bearish < 50)" => filter5_pass_long
+    "All Filters Confluence" => filter1_pass_long and filter2_pass_long and filter3_pass_long and filter4_pass_long and filter5_pass_long
+    => true
+
+passFilterShort = switch regimeMode
+    "None (Raw Breakout)" => true
+    "Filter 1: Hurst Exponent (H > 0.50)" => filter1_pass_short
+    "Filter 2: 200 EMA Trend Alignment" => filter2_pass_short
+    "Filter 3: Volume Expansion (> 1.3x SMA20)" => filter3_pass_short
+    "Filter 4: Range Size >= 0.4x ATR(14)" => filter4_pass_short
+    "Filter 5: RSI Momentum (Bullish > 50 / Bearish < 50)" => filter5_pass_short
+    "All Filters Confluence" => filter1_pass_short and filter2_pass_short and filter3_pass_short and filter4_pass_short and filter5_pass_short
+    => true
+
+// ==========================================
+// 4. BREAKOUT EXECUTION (5-MIN CANDLE BODY CLOSE)
+// ==========================================
+// A valid breakout occurs when candle BODY (close) breaks outside range
+longBreakout  = not inSession and not na(rangeHigh) and close > rangeHigh and close[1] <= rangeHigh and tradesToday < maxTradesPerDay
+shortBreakout = not inSession and not na(rangeLow) and close < rangeLow and close[1] >= rangeLow and tradesToday < maxTradesPerDay
+
+if longBreakout and passFilterLong and strategy.position_size == 0
+    float sl = rangeLow
+    float risk = close - sl
+    float tp = close + (targetR * risk)
+    strategy.entry("Long Breakout", strategy.long)
+    strategy.exit("Exit Long", "Long Breakout", stop=sl, limit=tp)
+    tradesToday := tradesToday + 1
+    alert("ORB LONG Breakout Triggered! Entry: " + str.tostring(close) + " SL: " + str.tostring(sl) + " TP: " + str.tostring(tp), alert.freq_once_per_bar_close)
+
+if shortBreakout and passFilterShort and strategy.position_size == 0
+    float sl = rangeHigh
+    float risk = sl - close
+    float tp = close - (targetR * risk)
+    strategy.entry("Short Breakout", strategy.short)
+    strategy.exit("Exit Short", "Short Breakout", stop=sl, limit=tp)
+    tradesToday := tradesToday + 1
+    alert("ORB SHORT Breakout Triggered! Entry: " + str.tostring(close) + " SL: " + str.tostring(sl) + " TP: " + str.tostring(tp), alert.freq_once_per_bar_close)
+
+// Visual Filter Table on Chart
+var table filterTable = table.new(position.top_right, 2, 7, bgcolor=color.new(color.black, 20), border_color=color.gray, border_width=1)
+if barstate.islast
+    table.cell(filterTable, 0, 0, "Regime Filter", bgcolor=color.navy, text_color=color.white, text_size=size.small)
+    table.cell(filterTable, 1, 0, "Status", bgcolor=color.navy, text_color=color.white, text_size=size.small)
+    
+    table.cell(filterTable, 0, 1, "1. Hurst (H > 0.50)", text_color=color.white, text_size=size.tiny)
+    table.cell(filterTable, 1, 1, filter1_pass_long ? "PASS (" + str.tostring(hurstExponent, "#.##") + ")" : "BLOCK (" + str.tostring(hurstExponent, "#.##") + ")", 
+               bgcolor=filter1_pass_long ? color.green : color.red, text_color=color.white, text_size=size.tiny)
+               
+    table.cell(filterTable, 0, 2, "2. 200 EMA Trend", text_color=color.white, text_size=size.tiny)
+    table.cell(filterTable, 1, 2, filter2_pass_long ? "BULLISH" : "BEARISH", 
+               bgcolor=filter2_pass_long ? color.green : color.red, text_color=color.white, text_size=size.tiny)
+
+    table.cell(filterTable, 0, 3, "3. Vol Expansion", text_color=color.white, text_size=size.tiny)
+    table.cell(filterTable, 1, 3, filter3_pass_long ? "PASS" : "LOW VOL", 
+               bgcolor=filter3_pass_long ? color.green : color.orange, text_color=color.white, text_size=size.tiny)
+
+    table.cell(filterTable, 0, 4, "4. Range vs ATR", text_color=color.white, text_size=size.tiny)
+    table.cell(filterTable, 1, 4, filter4_pass_long ? "VALID (" + str.tostring(rangeSize, "#.#") + ")" : "TOO TIGHT", 
+               bgcolor=filter4_pass_long ? color.green : color.red, text_color=color.white, text_size=size.tiny)
+
+    table.cell(filterTable, 0, 5, "5. RSI Momentum", text_color=color.white, text_size=size.tiny)
+    table.cell(filterTable, 1, 5, filter5_pass_long ? "BULLISH (" + str.tostring(rsi14, "#.#") + ")" : "BEARISH (" + str.tostring(rsi14, "#.#") + ")", 
+               bgcolor=filter5_pass_long ? color.green : color.red, text_color=color.white, text_size=size.tiny)
+
+    table.cell(filterTable, 0, 6, "Active Filter Mode", bgcolor=color.purple, text_color=color.white, text_size=size.tiny)
+    table.cell(filterTable, 1, 6, regimeMode, bgcolor=color.purple, text_color=color.white, text_size=size.tiny)
